@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <tx_api.h>
 
+#include "io.h"
+
 /**
  * @brief       Sets the state of the TS on connection to the TRC
  *
@@ -14,8 +16,7 @@
  */
 status_t trc_set_ts_on(GPIO_PinState state)
 {
-    HAL_GPIO_WritePin(TS_ON_GPIO_Port, TS_ON_Pin, state);
-    return STATUS_OK;
+    return VCU_Output_Write(TS_ON_GPIO_Port, TS_ON_Pin, state);
 }
 
 bool trc_ready(void)

@@ -3,6 +3,8 @@
 #include <can_c.h>
 #include <can_s.h>
 
+#include "io.h"
+
 #define PM100_NO_FAULTS                    0x00
 
 #define PM100_VSM_STATE_START              0x00
@@ -109,9 +111,8 @@ status_t pm100_init(pm100_context_t* pm100_ptr,
     }
 
     // turn off power
-    HAL_GPIO_WritePin(STATUS_GPIO_Port, // This pin used to be called STATUS
-                      STATUS_Pin,
-                      GPIO_PIN_RESET);
+    VCU_Output_Low(STATUS_GPIO_Port, // This pin used to be called STATUS
+                    STATUS_Pin);
 
     return status;
 }

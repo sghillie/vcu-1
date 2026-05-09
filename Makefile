@@ -97,6 +97,7 @@ src/SUFST/Src/Functions/clip_to_range.c \
 src/SUFST/Src/Functions/torque_map.c \
 src/SUFST/Src/Interfaces/apps.c \
 src/SUFST/Src/Interfaces/bps.c \
+src/SUFST/Src/Interfaces/io.c \
 src/SUFST/Src/Interfaces/rtds.c \
 src/SUFST/Src/Interfaces/scs.c \
 src/SUFST/Src/Interfaces/trc.c \

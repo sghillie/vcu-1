@@ -23,6 +23,7 @@
 #include "can.h"
 #include "usart.h"
 #include "gpio.h"
+#include "io.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -203,7 +204,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-    HAL_GPIO_WritePin(RED_LED_GPIO_Port, RED_LED_Pin, GPIO_PIN_SET);
+    VCU_Output_High(RED_LED_GPIO_Port, RED_LED_Pin);
   }
   /* USER CODE END Error_Handler_Debug */
 }

@@ -1,5 +1,7 @@
 #include "dash.h"
 
+#include "io.h"
+
 /*
  * internal functions
  */
@@ -87,10 +89,11 @@ status_t dash_init(dash_context_t *dash_ptr,
 
     // CubeMX will auto-generate code which sets initial pin states
     // however for ease of editing / readability it's done again here
-    HAL_GPIO_WritePin(R2D_LED_GPIO_Port, R2D_LED_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(DRS_LED_GPIO_Port, DRS_LED_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(VC_LEDS_GPIO_Port, VC_LEDS_Pin, GPIO_PIN_RESET);
+    
+    VCU_Output_Low(R2D_LED_GPIO_Port, R2D_LED_Pin);
+    VCU_Output_Low(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
+    VCU_Output_Low(DRS_LED_GPIO_Port, DRS_LED_Pin);
+    VCU_Output_Low(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 
     return status;
 }
@@ -122,11 +125,11 @@ void dash_thread_entry(ULONG input)
  */
 void run_visual_check(uint32_t ticks)
 {
-    HAL_GPIO_WritePin(VC_LEDS_GPIO_Port, VC_LEDS_Pin, GPIO_PIN_SET);
+    VCU_Output_High(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 
     tx_thread_sleep(ticks);
 
-    HAL_GPIO_WritePin(VC_LEDS_GPIO_Port, VC_LEDS_Pin, GPIO_PIN_RESET);
+    VCU_Output_Low(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 }
 
 /**
@@ -162,7 +165,7 @@ static void toggle_ts_on_callback(ULONG input)
     dash_context_t *dash_ptr = (dash_context_t *)input;
     UNUSED(dash_ptr);
 
-    HAL_GPIO_TogglePin(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
+    VCU_Output_Toggle(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
 }
 
 /**
@@ -189,9 +192,12 @@ status_t dash_set_ts_on_led_state(dash_context_t *dash_ptr, GPIO_PinState state)
         tx_status = tx_timer_deactivate(&dash_ptr->ts_on_toggle_timer);
     }
 
-    HAL_GPIO_WritePin(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin, state);
+    if (tx_status == TX_SUCCESS)
+    {
+        return VCU_Output_Write(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin, state);
+    }
 
-    return (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
+    return STATUS_ERROR;
 }
 
 /**
@@ -335,6 +341,5 @@ void dash_clear_buttons(dash_context_t *dash_ptr)
 status_t dash_set_r2d_led_state(dash_context_t *dash_ptr, GPIO_PinState state)
 {
     UNUSED(dash_ptr);
-    HAL_GPIO_WritePin(R2D_LED_GPIO_Port, R2D_LED_Pin, state);
-    return STATUS_OK;
+    return VCU_Output_Write(R2D_LED_GPIO_Port, R2D_LED_Pin, state);
 }
