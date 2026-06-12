@@ -17,7 +17,7 @@ status_t VCU_Output_High(GPIO_TypeDef* port, uint16_t pin){
 
 /**
  * @brief       Sets the specified GPIO pin(s) to high, so the output will be low,
- *              due to the io protection on the STAG 12 VCU
+ *              due to the io inversion on the STAG 12 VCU
  *
  * @param[in]   port  GPIO port definition
  * @param[in]   pin   GPIO pin number(s)
@@ -58,5 +58,18 @@ status_t VCU_Output_Toggle(GPIO_TypeDef* port, uint16_t pin) {
         return STATUS_OK;
     }
     return STATUS_ERROR;
+}
+
+/**
+  * @brief       Reads the logical state of the specified GPIO pin(s) based on STAG 12 VCU logic level inversion
+  * @param[in]   port  GPIO port definition
+  * @param[in]   pin   GPIO pin number(s)
+  */
+bool VCU_Input_Read(GPIO_TypeDef* port, uint16_t pin) {
+    if (!IS_GPIO_ALL_INSTANCE(port) || !IS_GPIO_PIN(pin)) {
+        return false;
+    }
+    GPIO_PinState pin_state = HAL_GPIO_ReadPin(port, pin);
+    return !pin_state;
 }
 

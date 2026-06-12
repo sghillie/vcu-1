@@ -90,10 +90,12 @@ status_t dash_init(dash_context_t *dash_ptr,
     // CubeMX will auto-generate code which sets initial pin states
     // however for ease of editing / readability it's done again here
     
-    VCU_Output_Low(R2D_LED_GPIO_Port, R2D_LED_Pin);
-    VCU_Output_Low(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
-    VCU_Output_Low(DRS_LED_GPIO_Port, DRS_LED_Pin);
-    VCU_Output_Low(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
+     /* LEDs are active-low; set outputs to 'high' (external off)
+         to ensure LEDs are off at init. */
+     VCU_Output_High(R2D_LED_GPIO_Port, R2D_LED_Pin);
+     VCU_Output_High(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
+     VCU_Output_High(DRS_LED_GPIO_Port, DRS_LED_Pin);
+     VCU_Output_High(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 
     return status;
 }
@@ -125,11 +127,11 @@ void dash_thread_entry(ULONG input)
  */
 void run_visual_check(uint32_t ticks)
 {
-    VCU_Output_High(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
+    VCU_Output_Low(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 
     tx_thread_sleep(ticks);
 
-    VCU_Output_Low(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
+    VCU_Output_High(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 }
 
 /**
@@ -251,7 +253,7 @@ status_t input_wait(input_context_t *input_ptr)
 
     while (!done && (status == STATUS_OK))
     {
-        bool state = (HAL_GPIO_ReadPin(input_ptr->port, input_ptr->pin) == GPIO_PIN_SET);
+        bool state = VCU_Input_Read(input_ptr->port, input_ptr->pin);
 
         // rising edge (active, previously inactive)
         if (state == input_ptr->active_state && (input_ptr->last_state != input_ptr->active_state))
@@ -291,7 +293,7 @@ status_t input_wait(input_context_t *input_ptr)
 bool input_update(input_context_t *input_ptr)
 {
     bool pressed = false;
-    bool state = (HAL_GPIO_ReadPin(input_ptr->port, input_ptr->pin) == GPIO_PIN_SET);
+    bool state = VCU_Input_Read(input_ptr->port, input_ptr->pin);
 
     // rising edge (active, previously inactive)
     if (state == input_ptr->active_state && (input_ptr->last_state != input_ptr->active_state))

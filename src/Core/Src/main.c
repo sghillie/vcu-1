@@ -114,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
     HAL_Delay(1000);
     /* USER CODE END WHILE */
 
@@ -204,7 +204,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-    VCU_Output_High(RED_LED_GPIO_Port, RED_LED_Pin);
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+    HAL_Delay(100);
+
   }
   /* USER CODE END Error_Handler_Debug */
 }

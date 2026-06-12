@@ -12,11 +12,13 @@
  */
 status_t rtds_activate(const config_rtds_t* config_ptr)
 {
-    VCU_Output_High(config_ptr->port, config_ptr->pin);
+
+    // unlinke other outouts, the RTDS is active high.
+    HAL_GPIO_WritePin(config_ptr->port, config_ptr->pin, GPIO_PIN_SET);
     LOG_INFO("Waiting - RTDS\n");
     UINT tx_status = tx_thread_sleep(config_ptr->active_ticks);
     LOG_INFO("Waited - RTDS\n");
-    VCU_Output_Low(config_ptr->port, config_ptr->pin);
+    HAL_GPIO_WritePin(config_ptr->port, config_ptr->pin, GPIO_PIN_RESET);
 
     return (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
 }
