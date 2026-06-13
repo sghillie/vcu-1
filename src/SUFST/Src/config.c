@@ -74,7 +74,7 @@ static const config_t config_instance = {
     },
     .bps = {
         .scs = {
-            .hadc = &hadc3,
+            .hadc = &hadc1,
             .min_adc = 0,
             .max_adc = 350,
             .min_mapped = 0,
