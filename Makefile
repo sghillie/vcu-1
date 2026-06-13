@@ -116,6 +116,13 @@ src/Core/Src/adc.c \
 src/Core/Src/can.c \
 src/Core/Src/gpio.c \
 src/Core/Src/usart.c \
+src/Core/Src/i2c.c \
+src/Core/Src/sdmmc.c \
+src/Core/Src/spi.c \
+src/Core/Src/tim.c \
+src/Core/Src/usb_otg.c \
+src/Core/Src/sysmem.c \
+src/Core/Src/syscalls.c \
 src/Core/Src/stm32f7xx_it.c \
 src/Core/Src/stm32f7xx_hal_msp.c \
 src/Core/Src/stm32f7xx_hal_timebase_tim.c \
@@ -143,6 +150,12 @@ src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart_ex.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_usart.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi_ex.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c \
+src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_mmc.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd_ex.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.c \
@@ -314,6 +327,7 @@ src/Middlewares/ST/threadx/common/src/tx_trace_isr_exit_insert.c \
 src/Middlewares/ST/threadx/common/src/tx_trace_object_register.c \
 src/Middlewares/ST/threadx/common/src/tx_trace_object_unregister.c \
 src/Middlewares/ST/threadx/common/src/tx_trace_user_event_insert.c \
+src/Middlewares/ST/threadx/utility/low_power/tx_low_power.c \
 src/Middlewares/SUFST/rtcan/src/rtcan.c \
 src/Middlewares/SUFST/can-defs/out/can_c.c \
 src/Middlewares/SUFST/can-defs/out/can_s.c
@@ -321,13 +335,13 @@ src/Middlewares/SUFST/can-defs/out/can_s.c
 ASM_SOURCES =  \
 src/startup_stm32f746xx.s \
 src/Core/Src/tx_initialize_low_level.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_context_restore.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_context_save.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_interrupt_control.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_schedule.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_stack_build.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_system_return.s \
-src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_timer_interrupt.s
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_context_restore.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_context_save.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_interrupt_control.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_schedule.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_stack_build.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_thread_system_return.S \
+src/Middlewares/ST/threadx/ports/cortex_m7/gnu/src/tx_timer_interrupt.S
 
 ###############################################################################
 # includes
@@ -414,11 +428,11 @@ $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) prebuild
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
 
 # ASM
-$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR) prebuild
+$(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR) prebuild
 	echo "$<"
 	$(AS) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o: %.S Makefile | $(BUILD_DIR) prebuild
+$(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR) prebuild
 	echo "$<"
 	$(AS) -c $(CFLAGS) $< -o $@
 
