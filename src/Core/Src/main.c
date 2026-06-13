@@ -31,7 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "io.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,8 +134,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
-    HAL_Delay(1000);
+    VCU_Output_Toggle(ROB_LED_GPIO_Port, ROB_LED_Pin);
+    HAL_Delay(200);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -261,7 +261,7 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
+    VCU_Output_Toggle(ROB_LED_GPIO_Port, ROB_LED_Pin);
     HAL_Delay(100);
 
   }
