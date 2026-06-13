@@ -44,7 +44,7 @@ status_t trc_wait_for_ready(uint32_t poll_ticks, uint32_t timeout)
         status = (tx_thread_sleep(poll_ticks) == TX_SUCCESS) ? STATUS_OK
                                                              : STATUS_ERROR;
 
-        bool ready_high = (VCU_Input_Read(TS_READY_GPIO_Port, TS_READY_Pin) == GPIO_PIN_SET);
+        bool ready_high = VCU_Input_Read(TS_READY_GPIO_Port, TS_READY_Pin);
 
         if (ready_high)
         {
