@@ -183,12 +183,22 @@ void log_thread_entry(ULONG thread_input)
             log_ptr->error &= ~LOG_ERROR_MUTEX;
         }
 
-        // print the message
-        HAL_StatusTypeDef status
-            = HAL_UART_Transmit(log_ptr->config_ptr->uart,
-                                (const uint8_t*) log_msg_to_send,
-                                strlen(log_msg_to_send),
-                                HAL_MAX_DELAY);
+        // print the message (uart -> debug header, then usart -> rs232)
+        HAL_StatusTypeDef uart_status = HAL_OK;
+        if (log_ptr->config_ptr->uart != NULL) {
+            uart_status = HAL_UART_Transmit(log_ptr->config_ptr->uart,
+                                            (const uint8_t*) log_msg_to_send,
+                                            strlen(log_msg_to_send),
+                                            HAL_MAX_DELAY);
+        }
+
+        HAL_StatusTypeDef usart_status = HAL_OK;
+        if (log_ptr->config_ptr->usart != NULL) {
+            usart_status = HAL_USART_Transmit(log_ptr->config_ptr->usart,
+                                              (const uint8_t*) log_msg_to_send,
+                                              strlen(log_msg_to_send),
+                                              HAL_MAX_DELAY);
+        }
 
         // unlock the UART mutex
         tx_status = tx_mutex_put(&log_ptr->uart_mutex);
@@ -201,13 +211,22 @@ void log_thread_entry(ULONG thread_input)
             log_ptr->error &= ~LOG_ERROR_MUTEX;
         }
 
-        if (status != HAL_OK)
+        if (uart_status != HAL_OK)
         {
             log_ptr->error |= LOG_ERROR_UART;
         }
         else
         {
             log_ptr->error &= ~LOG_ERROR_UART;
+        }
+
+        if (usart_status != HAL_OK)
+        {
+            log_ptr->error |= LOG_ERROR_USART;
+        }
+        else
+        {
+            log_ptr->error &= ~LOG_ERROR_USART;
         }
     }
 }

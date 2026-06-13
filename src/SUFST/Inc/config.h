@@ -182,6 +182,7 @@ typedef struct
      config_thread_t thread;
      config_log_level_t min_level;
      UART_HandleTypeDef *uart;
+     USART_HandleTypeDef *usart;
 } config_log_t;
 
 typedef struct

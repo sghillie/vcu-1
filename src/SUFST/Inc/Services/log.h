@@ -20,6 +20,7 @@
 #define LOG_ERROR_INIT  0x01 // initialisation error
 #define LOG_ERROR_UART  0x02 // UART transmit error
 #define LOG_ERROR_MUTEX 0x04 // mutex error
+#define LOG_ERROR_USART 0x08 // USART transmit error
 
 // the max length for a log message
 #define LOG_MSG_MAX_LEN 64
