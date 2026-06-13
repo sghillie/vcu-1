@@ -118,9 +118,9 @@ src/Core/Src/gpio.c \
 src/Core/Src/usart.c \
 src/Core/Src/stm32f7xx_it.c \
 src/Core/Src/stm32f7xx_hal_msp.c \
-src/Core/stm32f7xx_hal_timebase_tim.c \
+src/Core/Src/stm32f7xx_hal_timebase_tim.c \
 src/Core/Src/system_stm32f7xx.c \
-src/Core/app_threadx.c \
+src/Core/Src/app_threadx.c \
 src/AZURE_RTOS/App/app_azure_rtos.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc_ex.c \
