@@ -11,8 +11,11 @@
 static void remote_ctrl_thread_entry(ULONG input);
 static status_t lock_sim_sensors(remote_ctrl_context_t *remote_ctrl_ptr, uint32_t timeout);
 static void unlock_sim_sensors(remote_ctrl_context_t *remote_ctrl_ptr);
-static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr);
 void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr);
+
+#ifdef VCU_SIMULATION_MODE
+static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr);
+#endif
 
 #define BPS_LIGHT_THRESH 5
 
@@ -83,8 +86,7 @@ status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
 static void remote_ctrl_thread_entry(ULONG input)
 {
 
-    #ifndef VCU_SIMULATION_MODE
-    #else
+    #ifdef VCU_SIMULATION_MODE
         remote_ctrl_context_t *remote_ctrl_ptr = (remote_ctrl_context_t *)input;
             const config_remote_ctrl_t *config_ptr = remote_ctrl_ptr->config_ptr;
 

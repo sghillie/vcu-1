@@ -128,7 +128,6 @@ void ctrl_thread_entry(ULONG input)
 
     while (1)
     {
-        uint32_t start_time = tx_time_get();
         dash_update_buttons(ctrl_ptr->dash_ptr);
 
         ctrl_ptr->shdn_reading = trc_ready();
