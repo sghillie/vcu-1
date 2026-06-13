@@ -94,7 +94,7 @@ status_t dash_init(dash_context_t *dash_ptr,
          to ensure LEDs are off at init. */
      VCU_Output_High(R2D_LED_GPIO_Port, R2D_LED_Pin);
      VCU_Output_High(TS_ON_LED_GPIO_Port, TS_ON_LED_Pin);
-     VCU_Output_High(DRS_LED_GPIO_Port, DRS_LED_Pin);
+    //  VCU_Output_High(DRS_LED_GPIO_Port, DRS_LED_Pin);
      VCU_Output_High(VC_LEDS_GPIO_Port, VC_LEDS_Pin);
 
     return status;

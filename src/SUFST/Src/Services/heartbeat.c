@@ -61,13 +61,13 @@ static void heartbeat_thread_entry(ULONG input)
     heartbeat_context_t *heartbeat_h = (heartbeat_context_t *)input;
 
     // initialise LED
-    VCU_Output_Low(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
+    VCU_Output_Low(ROB_LED_GPIO_Port, ROB_LED_Pin);
 
     // main loop
     while (1)
     {
         // toggle LED
-        VCU_Output_Toggle(GREEN_LED_GPIO_Port, GREEN_LED_Pin);
+        VCU_Output_Toggle(ROB_LED_GPIO_Port, ROB_LED_Pin);
 
         // wait
         tx_thread_sleep(heartbeat_h->config_ptr->blink_period_ticks);
