@@ -41,6 +41,7 @@ typedef struct {
  */
 typedef struct {
      ADC_HandleTypeDef* hadc;                // ADC handle
+     uint32_t adc_channel;                   // ADC channel
      uint16_t min_adc;                       // minimum expected ADC reading
      uint16_t max_adc;                       // maximum expected ADC reading
      uint16_t min_mapped;                    // minimum mapped reading
