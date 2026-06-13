@@ -69,9 +69,8 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOB, SPARE_OUT_7_Pin|SPARE_OUT_6_Pin|SPARE_OUT_5_Pin|SPARE_OUT_4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, WHEELSPEED_RR_Pin|WHEELSPEED_RL_Pin|WHEELSPEED_FR_Pin|DEBUG_GPIO_1_Pin
-                          |DEBUG_GPIO_2_Pin|DEBUG_GPIO_3_Pin|DEBUG_GPIO_4_Pin|DEBUG_GPIO_5_Pin
-                          |DEBUG_GPIO_6_Pin|DEBUG_GPIO_7_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, SPARE_OUT_3_Pin|DEBUG_GPIO_1_Pin|DEBUG_GPIO_2_Pin|DEBUG_GPIO_3_Pin
+                          |DEBUG_GPIO_4_Pin|DEBUG_GPIO_5_Pin|DEBUG_GPIO_6_Pin|DEBUG_GPIO_7_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, DEBUG_GPIO_8_Pin|DEBUG_GPIO_9_Pin|DEBUG_GPIO_10_Pin, GPIO_PIN_RESET);
@@ -126,23 +125,21 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : WHEELSPEED_RR_Pin WHEELSPEED_RL_Pin WHEELSPEED_FR_Pin DEBUG_GPIO_1_Pin
-                           DEBUG_GPIO_2_Pin DEBUG_GPIO_3_Pin DEBUG_GPIO_4_Pin DEBUG_GPIO_5_Pin
-                           DEBUG_GPIO_6_Pin DEBUG_GPIO_7_Pin */
-  GPIO_InitStruct.Pin = WHEELSPEED_RR_Pin|WHEELSPEED_RL_Pin|WHEELSPEED_FR_Pin|DEBUG_GPIO_1_Pin
-                          |DEBUG_GPIO_2_Pin|DEBUG_GPIO_3_Pin|DEBUG_GPIO_4_Pin|DEBUG_GPIO_5_Pin
-                          |DEBUG_GPIO_6_Pin|DEBUG_GPIO_7_Pin;
+  /*Configure GPIO pins : WHEELSPEED_RR_Pin WHEELSPEED_RL_Pin WHEELSPEED_FR_Pin WHEELSPEED_FL_Pin
+                           SPARE_IN_3_Pin GPS_PPS_Pin SPARE_IN_2_Pin */
+  GPIO_InitStruct.Pin = WHEELSPEED_RR_Pin|WHEELSPEED_RL_Pin|WHEELSPEED_FR_Pin|WHEELSPEED_FL_Pin
+                          |SPARE_IN_3_Pin|GPS_PPS_Pin|SPARE_IN_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SPARE_OUT_3_Pin DEBUG_GPIO_1_Pin DEBUG_GPIO_2_Pin DEBUG_GPIO_3_Pin
+                           DEBUG_GPIO_4_Pin DEBUG_GPIO_5_Pin DEBUG_GPIO_6_Pin DEBUG_GPIO_7_Pin */
+  GPIO_InitStruct.Pin = SPARE_OUT_3_Pin|DEBUG_GPIO_1_Pin|DEBUG_GPIO_2_Pin|DEBUG_GPIO_3_Pin
+                          |DEBUG_GPIO_4_Pin|DEBUG_GPIO_5_Pin|DEBUG_GPIO_6_Pin|DEBUG_GPIO_7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : WHEELSPEED_FL_Pin SPARE_IN_3_Pin GPS_PPS_Pin SPARE_IN_2_Pin
-                           SPARE_OUT_3_Pin */
-  GPIO_InitStruct.Pin = WHEELSPEED_FL_Pin|SPARE_IN_3_Pin|GPS_PPS_Pin|SPARE_IN_2_Pin
-                          |SPARE_OUT_3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SPARE_OUT_2_Pin SPARE_OUT_1_Pin APPS_PWR_GOOD_Pin SPARE_IN_1_Pin
