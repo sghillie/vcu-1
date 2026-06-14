@@ -18,5 +18,5 @@ void rs232_disable(void)
 
 bool rs232_is_valid(void)
 {
-    return HAL_GPIO_ReadPin(RS232_BAD_GPIO_Port, RS232_BAD_Pin) == GPIO_PIN_RESET;
+    return HAL_GPIO_ReadPin(RS232_BAD_GPIO_Port, RS232_BAD_Pin) == GPIO_PIN_SET;
 }
