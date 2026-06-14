@@ -53,6 +53,7 @@
     "can_c.h": "c",
     "ctrl.h": "c"
   },
+  "cortex-debug.gdbPath": "gdb-multiarch",
   "cortex-debug.variableUseNaturalFormat": true,
   "C_Cpp.errorSquiggles": "Enabled",
   "mcu-debug.rtos-views.showRTOS": false
