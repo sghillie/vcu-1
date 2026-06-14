@@ -90,6 +90,11 @@ LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) \
 # sources
 ###############################################################################
 
+# TODO: add back:
+# src/Core/Src/sdmmc.c
+# src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c
+# src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c
+# src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_mmc.c
 C_SOURCES =  \
 src/SUFST/Src/vcu.c \
 src/SUFST/Src/config.c \
@@ -98,6 +103,7 @@ src/SUFST/Src/Functions/torque_map.c \
 src/SUFST/Src/Interfaces/apps.c \
 src/SUFST/Src/Interfaces/bps.c \
 src/SUFST/Src/Interfaces/io.c \
+src/SUFST/Src/Interfaces/rs232.c \
 src/SUFST/Src/Interfaces/rtds.c \
 src/SUFST/Src/Interfaces/scs.c \
 src/SUFST/Src/Interfaces/trc.c \
@@ -117,7 +123,6 @@ src/Core/Src/can.c \
 src/Core/Src/gpio.c \
 src/Core/Src/usart.c \
 src/Core/Src/i2c.c \
-src/Core/Src/sdmmc.c \
 src/Core/Src/spi.c \
 src/Core/Src/tim.c \
 src/Core/Src/usb_otg.c \
@@ -153,9 +158,6 @@ src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart_ex.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_usart.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi_ex.c \
-src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c \
-src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c \
-src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_mmc.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd_ex.c \
 src/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.c \
