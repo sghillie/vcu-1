@@ -16,6 +16,7 @@
 #include <usart.h>
 
 #include "config.h"
+#include "rs232.h"
 #include "status.h"
 
 // internal function prototype
@@ -43,6 +44,8 @@ status_t log_init(log_context_t *log_ptr,
     log_ptr->config_ptr = config_ptr;
     log_ptr->error = LOG_ERROR_NONE;
     global_log_context = log_ptr;
+
+    rs232_enable();
 
     status_t status = STATUS_OK;
 
@@ -183,7 +186,7 @@ void log_thread_entry(ULONG thread_input)
             log_ptr->error &= ~LOG_ERROR_MUTEX;
         }
 
-        // print the message (uart -> debug header, then usart -> rs232)
+        // print the message (uart -> rs232, then usart -> debug header)
         HAL_StatusTypeDef uart_status = HAL_OK;
         if (log_ptr->config_ptr->uart != NULL) {
             uart_status = HAL_UART_Transmit(log_ptr->config_ptr->uart,

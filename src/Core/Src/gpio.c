@@ -55,9 +55,9 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, ROB_LED_Pin|RS232_BAD_Pin|VC_LEDS_Pin|LED_4_Pin
-                          |R2D_LED_Pin|LED_2_Pin|TS_ON_LED_Pin|TS_ON_Pin
-                          |BRAKELIGHT_EN_Pin|STATUS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, ROB_LED_Pin|VC_LEDS_Pin|LED_4_Pin|R2D_LED_Pin
+                          |LED_2_Pin|TS_ON_LED_Pin|TS_ON_Pin|BRAKELIGHT_EN_Pin
+                          |STATUS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, RS232_FORCEOFF_Pin|RS232_FORCEON_Pin|IMU_MODE_Pin|EEPROM_WC_Pin, GPIO_PIN_RESET);
@@ -75,22 +75,22 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, DEBUG_GPIO_8_Pin|DEBUG_GPIO_9_Pin|DEBUG_GPIO_10_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : ROB_LED_Pin RS232_BAD_Pin VC_LEDS_Pin LED_4_Pin
-                           R2D_LED_Pin LED_2_Pin TS_ON_LED_Pin TS_ON_Pin
-                           BRAKELIGHT_EN_Pin STATUS_Pin */
-  GPIO_InitStruct.Pin = ROB_LED_Pin|RS232_BAD_Pin|VC_LEDS_Pin|LED_4_Pin
-                          |R2D_LED_Pin|LED_2_Pin|TS_ON_LED_Pin|TS_ON_Pin
-                          |BRAKELIGHT_EN_Pin|STATUS_Pin;
+  /*Configure GPIO pins : ROB_LED_Pin VC_LEDS_Pin LED_4_Pin R2D_LED_Pin
+                           LED_2_Pin TS_ON_LED_Pin TS_ON_Pin BRAKELIGHT_EN_Pin
+                           STATUS_Pin */
+  GPIO_InitStruct.Pin = ROB_LED_Pin|VC_LEDS_Pin|LED_4_Pin|R2D_LED_Pin
+                          |LED_2_Pin|TS_ON_LED_Pin|TS_ON_Pin|BRAKELIGHT_EN_Pin
+                          |STATUS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : SD_CARD_DETECT_Pin */
-  GPIO_InitStruct.Pin = SD_CARD_DETECT_Pin;
+  /*Configure GPIO pins : SD_CARD_DETECT_Pin RS232_BAD_Pin */
+  GPIO_InitStruct.Pin = SD_CARD_DETECT_Pin|RS232_BAD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(SD_CARD_DETECT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RS232_FORCEOFF_Pin RS232_FORCEON_Pin IMU_MODE_Pin EEPROM_WC_Pin */
   GPIO_InitStruct.Pin = RS232_FORCEOFF_Pin|RS232_FORCEON_Pin|IMU_MODE_Pin|EEPROM_WC_Pin;
