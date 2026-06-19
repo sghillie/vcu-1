@@ -224,6 +224,10 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 {
     rtcan_status_t status;
 
+    LOG_ERROR("CAN error 0x%08lX on %s\n",
+              HAL_CAN_GetError(can_h),
+              (can_h == vcu_ptr->rtcan_c.hcan) ? "CAN_C" : "CAN_S");
+
     if (vcu_ptr->rtcan_c.hcan == can_h)
     {
         status = rtcan_handle_hal_error(&vcu_ptr->rtcan_c, can_h);
