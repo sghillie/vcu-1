@@ -331,6 +331,7 @@ src/Middlewares/ST/threadx/common/src/tx_trace_object_unregister.c \
 src/Middlewares/ST/threadx/common/src/tx_trace_user_event_insert.c \
 src/Middlewares/ST/threadx/utility/low_power/tx_low_power.c \
 src/Middlewares/SUFST/rtcan/src/rtcan.c \
+src/Middlewares/SUFST/rtcan/src/rtcan_osal_threadx.c \
 src/Middlewares/SUFST/can-defs/out/can_c.c \
 src/Middlewares/SUFST/can-defs/out/can_s.c
 

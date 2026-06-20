@@ -41,34 +41,66 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
     }
 
     // RTCAN services
+#define RTCAN_THREAD_STACK_SIZE 1024U
     rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_c};
     CAN_HandleTypeDef *can_handles[] = {can_s_h, can_c_h};
-    ULONG rtcan_priorities[] = {vcu_ptr->config_ptr->rtos.rtcan_s_priority,
-                                vcu_ptr->config_ptr->rtos.rtcan_c_priority};
+    uint32_t rtcan_priorities[] = {vcu_ptr->config_ptr->rtos.rtcan_s_priority,
+                                   vcu_ptr->config_ptr->rtos.rtcan_c_priority};
 
     for (uint32_t i = 0; i < 2; i++)
     {
         if (status == STATUS_OK)
         {
-            rtcan_status_t rtcan_status = rtcan_init(rtcan_handles[i],
-                                                     can_handles[i],
-                                                     rtcan_priorities[i],
-                                                     app_mem_pool);
-
-            if (rtcan_status == RTCAN_OK)
+            void *tx_stack = NULL;
+            void *rx_stack = NULL;
+            UINT mem_status = tx_byte_allocate(app_mem_pool,
+                                               &tx_stack,
+                                               RTCAN_THREAD_STACK_SIZE,
+                                               TX_NO_WAIT);
+            if (mem_status == TX_SUCCESS)
             {
-                rtcan_status = rtcan_start(rtcan_handles[i]);
+                mem_status = tx_byte_allocate(app_mem_pool,
+                                              &rx_stack,
+                                              RTCAN_THREAD_STACK_SIZE,
+                                              TX_NO_WAIT);
             }
 
-            if (rtcan_status != RTCAN_OK)
+            if (mem_status != TX_SUCCESS)
             {
                 // TODO: error
                 status = STATUS_ERROR;
-                // vcu_h->err |= VCU_ERROR_INIT;
             }
             else
             {
-                LOG_INFO("RTCAN service %d started\n", i);
+                const rtcan_config_t rtcan_config = {
+                    .thread_priority = rtcan_priorities[i],
+                    .tx_thread_stack_size = RTCAN_THREAD_STACK_SIZE,
+                    .rx_thread_stack_size = RTCAN_THREAD_STACK_SIZE,
+                    .tx_thread_stack_mem = tx_stack,
+                    .rx_thread_stack_mem = rx_stack,
+                    .filters = NULL,
+                    .filter_count = 0U,
+                };
+
+                rtcan_status_t rtcan_status = rtcan_init(rtcan_handles[i],
+                                                         can_handles[i],
+                                                         &rtcan_config);
+
+                if (rtcan_status == RTCAN_OK)
+                {
+                    rtcan_status = rtcan_start(rtcan_handles[i]);
+                }
+
+                if (rtcan_status != RTCAN_OK)
+                {
+                    // TODO: error
+                    status = STATUS_ERROR;
+                    // vcu_h->err |= VCU_ERROR_INIT;
+                }
+                else
+                {
+                    LOG_INFO("RTCAN service %d started\n", i);
+                }
             }
         }
     }
