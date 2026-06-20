@@ -13,6 +13,7 @@
 #include <can_s.h>
 #include <rtcan.h>
 #include <stdint.h>
+#include "log.h"
 #include <tx_api.h>
 
 #include "config.h"

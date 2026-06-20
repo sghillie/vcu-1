@@ -102,7 +102,8 @@ static void send_bc_messages(canbc_context_t *canbc_h)
             can_s_vcu_state_pack(message.data,
                                  &canbc_h->states.state,
                                  message.length);
-            rtcan_transmit(canbc_h->rtcan_h, &message);
+            if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+                LOG_ERROR("canbc: failed to transmit VCU state\n");
         }
 
         // sensors
@@ -114,7 +115,8 @@ static void send_bc_messages(canbc_context_t *canbc_h)
             can_s_vcu_sensors_pack(message.data,
                                    &canbc_h->states.sensors,
                                    message.length);
-            rtcan_transmit(canbc_h->rtcan_h, &message);
+            if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+                LOG_ERROR("canbc: failed to transmit VCU sensors\n");
         }
         // temps
         {
@@ -125,7 +127,8 @@ static void send_bc_messages(canbc_context_t *canbc_h)
             can_s_vcu_temps_pack(message.data,
                                  &canbc_h->states.temps,
                                  message.length);
-            rtcan_transmit(canbc_h->rtcan_h, &message);
+            if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+                LOG_ERROR("canbc: failed to transmit VCU temps\n");
         }
 
         // errors
@@ -137,7 +140,8 @@ static void send_bc_messages(canbc_context_t *canbc_h)
             can_s_vcu_error_pack(message.data,
                                  &canbc_h->states.errors,
                                  message.length);
-            rtcan_transmit(canbc_h->rtcan_h, &message);
+            if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+                LOG_ERROR("canbc: failed to transmit VCU errors\n");
         }
 
         {
@@ -148,7 +152,8 @@ static void send_bc_messages(canbc_context_t *canbc_h)
             can_s_vcu_pdm_pack(message.data,
                                &canbc_h->states.pdm,
                                message.length);
-            rtcan_transmit(canbc_h->rtcan_h, &message);
+            if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+                LOG_ERROR("canbc: failed to transmit VCU PDM\n");
         }
 
         tx_mutex_put(&canbc_h->state_mutex);
