@@ -32,7 +32,7 @@
 typedef struct
 {
      rtcan_handle_t rtcan_s;        // RTCAN service for sensors CAN bus
-     rtcan_handle_t rtcan_c;        // RTCAN service for critical systems CAN bus
+     rtcan_handle_t rtcan_t;        // RTCAN service for critical systems CAN bus
      canbc_context_t canbc;         // CAN broadcasting service instance
      dash_context_t dash;           // dash service
      ctrl_context_t ctrl;           // control service
@@ -51,7 +51,7 @@ typedef struct
  */
 
 status_t vcu_init(vcu_context_t* vcu_ptr,
-                  CAN_HandleTypeDef* can_c_h,
+                  CAN_HandleTypeDef* can_t_h,
                   CAN_HandleTypeDef* can_s_h,
                   TX_BYTE_POOL* app_mem_pool,
                   const config_t* config_ptr);

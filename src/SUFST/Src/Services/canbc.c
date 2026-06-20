@@ -1,6 +1,6 @@
 #include "canbc.h"
 
-#include <can_c.h>
+#include <can_t.h>
 
 /*
  * internal function prototypes

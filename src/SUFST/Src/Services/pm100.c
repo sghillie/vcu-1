@@ -1,6 +1,6 @@
 #include "pm100.h"
 
-#include <can_c.h>
+#include <can_t.h>
 #include <can_s.h>
 
 #include "io.h"
@@ -44,18 +44,18 @@ static void process_broadcast(pm100_context_t* pm100_ptr,
  *
  * @param[in]   pm100_ptr       PM100 context
  * @param[in]   stack_pool_ptr  Memory pool for service thread stack
- * @param[in]   rtcan_c_ptr     RTCAN C instance for receiving broadcasts
+ * @param[in]   rtcan_t_ptr     RTCAN T instance for receiving broadcasts
  * @param[in]   rtcan_s_ptr     RTCAN S instance for sending precharge cmd
  * @param[in]   config_ptr      Configuration
  */
 status_t pm100_init(pm100_context_t* pm100_ptr,
                     TX_BYTE_POOL* stack_pool_ptr,
-                    rtcan_handle_t* rtcan_c_ptr,
+                    rtcan_handle_t* rtcan_t_ptr,
                     rtcan_handle_t* rtcan_s_ptr,
                     const config_pm100_t* config_ptr)
 {
     pm100_ptr->config_ptr = config_ptr;
-    pm100_ptr->rtcan_c_ptr = rtcan_c_ptr;
+    pm100_ptr->rtcan_t_ptr = rtcan_t_ptr;
     pm100_ptr->rtcan_s_ptr = rtcan_s_ptr;
     pm100_ptr->error = PM100_ERROR_NONE;
     pm100_ptr->broadcasts_valid = false;
@@ -129,17 +129,17 @@ void pm100_thread_entry(ULONG input)
     const config_pm100_t* config_ptr = pm100_ptr->config_ptr;
 
     // set up RTCAN subscriptions
-    uint32_t subscriptions[] = {CAN_C_PM100_INTERNAL_STATES_FRAME_ID,
-                                CAN_C_PM100_FAULT_CODES_FRAME_ID,
-                                CAN_C_PM100_TEMPERATURE_SET_1_FRAME_ID,
-                                CAN_C_PM100_TEMPERATURE_SET_2_FRAME_ID,
-                                CAN_C_PM100_TEMPERATURE_SET_3_FRAME_ID,
-                                CAN_C_PM100_MOTOR_POSITION_INFO_FRAME_ID};
+    uint32_t subscriptions[] = {CAN_T_PM100_INTERNAL_STATES_FRAME_ID,
+                                CAN_T_PM100_FAULT_CODES_FRAME_ID,
+                                CAN_T_PM100_TEMPERATURE_SET_1_FRAME_ID,
+                                CAN_T_PM100_TEMPERATURE_SET_2_FRAME_ID,
+                                CAN_T_PM100_TEMPERATURE_SET_3_FRAME_ID,
+                                CAN_T_PM100_MOTOR_POSITION_INFO_FRAME_ID};
 
     for (uint32_t i = 0; i < sizeof(subscriptions) / sizeof(subscriptions[0]);
          i++)
     {
-        rtcan_status_t status = rtcan_subscribe(pm100_ptr->rtcan_c_ptr,
+        rtcan_status_t status = rtcan_subscribe(pm100_ptr->rtcan_t_ptr,
                                                 subscriptions[i],
                                                 &pm100_ptr->can_rx_queue);
 
@@ -171,7 +171,7 @@ void pm100_thread_entry(ULONG input)
         {
             pm100_ptr->broadcasts_valid = true;
             process_broadcast(pm100_ptr, msg_ptr);
-            rtcan_msg_consumed(pm100_ptr->rtcan_c_ptr, msg_ptr);
+            rtcan_msg_consumed(pm100_ptr->rtcan_t_ptr, msg_ptr);
         }
         else
         {
@@ -190,18 +190,18 @@ void process_broadcast(pm100_context_t* pm100_ptr, const rtcan_msg_t* msg_ptr)
 {
     switch (msg_ptr->identifier)
     {
-    case CAN_C_PM100_INTERNAL_STATES_FRAME_ID:
+    case CAN_T_PM100_INTERNAL_STATES_FRAME_ID:
     {
-        can_c_pm100_internal_states_unpack(&pm100_ptr->states,
+        can_t_pm100_internal_states_unpack(&pm100_ptr->states,
                                            msg_ptr->data,
                                            msg_ptr->length);
 
         break;
     }
 
-    case CAN_C_PM100_FAULT_CODES_FRAME_ID:
+    case CAN_T_PM100_FAULT_CODES_FRAME_ID:
     {
-        can_c_pm100_fault_codes_unpack(&pm100_ptr->faults,
+        can_t_pm100_fault_codes_unpack(&pm100_ptr->faults,
                                        msg_ptr->data,
                                        msg_ptr->length);
 
@@ -221,41 +221,41 @@ void process_broadcast(pm100_context_t* pm100_ptr, const rtcan_msg_t* msg_ptr)
         break;
     }
 
-    case CAN_C_PM100_TEMPERATURE_SET_1_FRAME_ID:
+    case CAN_T_PM100_TEMPERATURE_SET_1_FRAME_ID:
     {
-        can_c_pm100_temperature_set_1_unpack(&pm100_ptr->temp1,
+        can_t_pm100_temperature_set_1_unpack(&pm100_ptr->temp1,
                                              msg_ptr->data,
                                              msg_ptr->length);
 
         break;
     }
 
-    case CAN_C_PM100_TEMPERATURE_SET_2_FRAME_ID:
+    case CAN_T_PM100_TEMPERATURE_SET_2_FRAME_ID:
     {
-        can_c_pm100_temperature_set_2_unpack(&pm100_ptr->temp2,
+        can_t_pm100_temperature_set_2_unpack(&pm100_ptr->temp2,
                                              msg_ptr->data,
                                              msg_ptr->length);
 
         break;
-        can_c_pm100_temperature_set_2_unpack(&pm100_ptr->temp2,
-                                             msg_ptr->data,
-                                             msg_ptr->length);
-
-        break;
-    }
-
-    case CAN_C_PM100_TEMPERATURE_SET_3_FRAME_ID:
-    {
-        can_c_pm100_temperature_set_3_unpack(&pm100_ptr->temp3,
+        can_t_pm100_temperature_set_2_unpack(&pm100_ptr->temp2,
                                              msg_ptr->data,
                                              msg_ptr->length);
 
         break;
     }
 
-    case CAN_C_PM100_MOTOR_POSITION_INFO_FRAME_ID:
+    case CAN_T_PM100_TEMPERATURE_SET_3_FRAME_ID:
     {
-        can_c_pm100_motor_position_info_unpack(&pm100_ptr->info,
+        can_t_pm100_temperature_set_3_unpack(&pm100_ptr->temp3,
+                                             msg_ptr->data,
+                                             msg_ptr->length);
+
+        break;
+    }
+
+    case CAN_T_PM100_MOTOR_POSITION_INFO_FRAME_ID:
+    {
+        can_t_pm100_motor_position_info_unpack(&pm100_ptr->info,
                                                msg_ptr->data,
                                                msg_ptr->length);
         break;
@@ -396,12 +396,12 @@ status_t pm100_lvs_off(pm100_context_t* pm100_ptr)
 status_t pm100_disable(pm100_context_t* pm100_ptr)
 {
     LOG_INFO("Sending PM100 Disable command\n");
-    rtcan_msg_t msg = {.identifier = CAN_C_PM100_COMMAND_MESSAGE_FRAME_ID,
-                       .length = CAN_C_PM100_COMMAND_MESSAGE_LENGTH,
-                       .extended = CAN_C_PM100_COMMAND_MESSAGE_IS_EXTENDED,
+    rtcan_msg_t msg = {.identifier = CAN_T_PM100_COMMAND_MESSAGE_FRAME_ID,
+                       .length = CAN_T_PM100_COMMAND_MESSAGE_LENGTH,
+                       .extended = CAN_T_PM100_COMMAND_MESSAGE_IS_EXTENDED,
                        .data = {0, 0, 0, 0, 0, 0, 0, 0}};
 
-    rtcan_status_t status = rtcan_transmit(pm100_ptr->rtcan_c_ptr, &msg);
+    rtcan_status_t status = rtcan_transmit(pm100_ptr->rtcan_t_ptr, &msg);
 
     return (status == RTCAN_OK) ? STATUS_OK : STATUS_ERROR;
 }
@@ -442,9 +442,9 @@ status_t pm100_request_torque(pm100_context_t* pm100_ptr, uint16_t torque)
                 bool inverter_enable = PM100_INVERTER_ON;
 
                 rtcan_msg_t msg
-                    = {.identifier = CAN_C_PM100_COMMAND_MESSAGE_FRAME_ID,
-                       .length = CAN_C_PM100_COMMAND_MESSAGE_LENGTH,
-                       .extended = CAN_C_PM100_COMMAND_MESSAGE_IS_EXTENDED,
+                    = {.identifier = CAN_T_PM100_COMMAND_MESSAGE_FRAME_ID,
+                       .length = CAN_T_PM100_COMMAND_MESSAGE_LENGTH,
+                       .extended = CAN_T_PM100_COMMAND_MESSAGE_IS_EXTENDED,
                        .data = {0, 0, 0, 0, 0, 0, 0, 0}};
 
                 uint16_t speed = pm100_motor_speed(pm100_ptr);
@@ -453,17 +453,17 @@ status_t pm100_request_torque(pm100_context_t* pm100_ptr, uint16_t torque)
                     inverter_enable = PM100_INVERTER_OFF;
                 }
 
-                struct can_c_pm100_command_message_t cmd
+                struct can_t_pm100_command_message_t cmd
                     = {.pm100_torque_command = torque,
                        .pm100_direction_command = PM100_DIRECTION_REVERSE,
                        .pm100_speed_mode_enable = PM100_SPEED_MODE_DISABLE,
                        .pm100_inverter_enable = inverter_enable};
 
-                can_c_pm100_command_message_pack(msg.data, &cmd, msg.length);
+                can_t_pm100_command_message_pack(msg.data, &cmd, msg.length);
 
                 LOG_INFO("Sending torque request\n");
                 rtcan_status_t rtcan_status
-                    = rtcan_transmit(pm100_ptr->rtcan_c_ptr, &msg);
+                    = rtcan_transmit(pm100_ptr->rtcan_t_ptr, &msg);
                 status = (rtcan_status == RTCAN_OK) ? STATUS_OK : STATUS_ERROR;
             }
             else

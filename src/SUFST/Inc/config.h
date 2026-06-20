@@ -189,7 +189,7 @@ typedef struct
 typedef struct
 {
      uint8_t rtcan_s_priority;
-     uint8_t rtcan_c_priority;
+     uint8_t rtcan_t_priority;
      uint8_t ts_ctrl_thread_priority;
      bool tracex_enable;
      uint16_t driver_ctrl_tick_rate;
@@ -251,7 +251,7 @@ const config_t* config_get();
 //  ***************************************************************************/
 
 // #define RTCAN_S_PRIORITY                    3   
-// #define RTCAN_C_PRIORITY                    2   // critical systems more important than sensors
+// #define RTCAN_T_PRIORITY                    2   // critical systems more important than sensors
 // #define TS_CTRL_THREAD_PRIORITY		        2
 
 // #define TRACEX_ENABLE                       0

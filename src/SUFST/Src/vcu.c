@@ -19,13 +19,13 @@
  * @brief       Initialises the VCU and all system services
  *
  * @param[in]   vcu_ptr         VCU instance
- * @param[in]   can_c_h         Critical systems CAN bus handle
+ * @param[in]   can_t_h         Critical systems CAN bus handle
  * @param[in]   can_s_h         Sensor CAN bus handle
  * @param[in]   app_mem_pool    Pointer to RTOS application memory pool
  * @param[in]   config_ptr      Pointer to VCU configuration instance
  */
 status_t vcu_init(vcu_context_t *vcu_ptr,
-                  CAN_HandleTypeDef *can_c_h,
+                  CAN_HandleTypeDef *can_t_h,
                   CAN_HandleTypeDef *can_s_h,
                   TX_BYTE_POOL *app_mem_pool,
                   const config_t *config_ptr)
@@ -42,10 +42,10 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
 
     // RTCAN services
 #define RTCAN_THREAD_STACK_SIZE 1024U
-    rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_c};
-    CAN_HandleTypeDef *can_handles[] = {can_s_h, can_c_h};
+    rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t};
+    CAN_HandleTypeDef *can_handles[] = {can_s_h, can_t_h};
     uint32_t rtcan_priorities[] = {vcu_ptr->config_ptr->rtos.rtcan_s_priority,
-                                   vcu_ptr->config_ptr->rtos.rtcan_c_priority};
+                                   vcu_ptr->config_ptr->rtos.rtcan_t_priority};
 
     for (uint32_t i = 0; i < 2; i++)
     {
@@ -138,7 +138,7 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
     {
         status = pm100_init(&vcu_ptr->pm100,
                             app_mem_pool,
-                            &vcu_ptr->rtcan_c,
+                            &vcu_ptr->rtcan_t,
                             &vcu_ptr->rtcan_s,
                             &vcu_ptr->config_ptr->pm100);
     }
@@ -193,7 +193,7 @@ status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr,
                                             CAN_HandleTypeDef *can_h)
 {
     // TODO: how to handle CAN C vs CAN S
-    rtcan_status_t status = rtcan_handle_tx_mailbox_callback(&vcu_ptr->rtcan_c, can_h);
+    rtcan_status_t status = rtcan_handle_tx_mailbox_callback(&vcu_ptr->rtcan_t, can_h);
 
     if (status != RTCAN_OK)
     {
@@ -228,9 +228,9 @@ status_t vcu_handle_can_rx_it(vcu_context_t *vcu_ptr,
 {
     rtcan_status_t status;
 
-    if (vcu_ptr->rtcan_c.hcan == can_h)
+    if (vcu_ptr->rtcan_t.hcan == can_h)
     {
-        status = rtcan_handle_rx_it(&vcu_ptr->rtcan_c, can_h, rx_fifo);
+        status = rtcan_handle_rx_it(&vcu_ptr->rtcan_t, can_h, rx_fifo);
     }
     else if (vcu_ptr->rtcan_s.hcan == can_h)
     {
@@ -258,11 +258,11 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 
     LOG_ERROR("CAN error 0x%08lX on %s\n",
               HAL_CAN_GetError(can_h),
-              (can_h == vcu_ptr->rtcan_c.hcan) ? "CAN_C" : "CAN_S");
+              (can_h == vcu_ptr->rtcan_t.hcan) ? "CAN_T" : "CAN_S");
 
-    if (vcu_ptr->rtcan_c.hcan == can_h)
+    if (vcu_ptr->rtcan_t.hcan == can_h)
     {
-        status = rtcan_handle_hal_error(&vcu_ptr->rtcan_c, can_h);
+        status = rtcan_handle_hal_error(&vcu_ptr->rtcan_t, can_h);
     }
     else if (vcu_ptr->rtcan_s.hcan == can_h)
     {

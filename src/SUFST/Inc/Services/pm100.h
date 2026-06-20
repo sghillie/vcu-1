@@ -12,7 +12,7 @@
 #ifndef PM100_H
 #define PM100_H
 
-#include <can_c.h>
+#include <can_t.h>
 #include <rtcan.h>
 #include <stdint.h>
 #include <tx_api.h>
@@ -38,18 +38,18 @@
 typedef struct
 {
      TX_THREAD thread;
-     rtcan_handle_t* rtcan_c_ptr;
+     rtcan_handle_t* rtcan_t_ptr;
      rtcan_handle_t* rtcan_s_ptr;
      TX_QUEUE can_rx_queue;
      ULONG can_rx_queue_mem[PM100_RX_QUEUE_SIZE];
      TX_MUTEX state_mutex;
      bool broadcasts_valid;
-     struct can_c_pm100_internal_states_t states;
-     struct can_c_pm100_fault_codes_t faults;
-     struct can_c_pm100_temperature_set_1_t temp1;
-     struct can_c_pm100_temperature_set_2_t temp2;
-     struct can_c_pm100_temperature_set_3_t temp3;
-     struct can_c_pm100_motor_position_info_t info;
+     struct can_t_pm100_internal_states_t states;
+     struct can_t_pm100_fault_codes_t faults;
+     struct can_t_pm100_temperature_set_1_t temp1;
+     struct can_t_pm100_temperature_set_2_t temp2;
+     struct can_t_pm100_temperature_set_3_t temp3;
+     struct can_t_pm100_motor_position_info_t info;
      uint16_t error;
      const config_pm100_t* config_ptr;
 } pm100_context_t;
@@ -59,7 +59,7 @@ typedef struct
  */
 status_t pm100_init(pm100_context_t* pm100_ptr,
                     TX_BYTE_POOL* stack_pool_ptr,
-                    rtcan_handle_t* rtcan_c_ptr,
+                    rtcan_handle_t* rtcan_t_ptr,
                     rtcan_handle_t* rtcan_s_ptr,
                     const config_pm100_t* config_ptr);
 status_t pm100_lvs_on(pm100_context_t* pm100_ptr);

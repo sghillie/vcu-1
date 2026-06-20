@@ -9,7 +9,7 @@
 #define CANBC_H
 
 #include <can.h>
-#include <can_c.h>
+#include <can_t.h>
 #include <can_s.h>
 #include <rtcan.h>
 #include <stdint.h>

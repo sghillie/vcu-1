@@ -50,7 +50,7 @@
     "torque_map_funcs.h": "c",
     "rtds.h": "c",
     "pm100.h": "c",
-    "can_c.h": "c",
+    "can_t.h": "c",
     "ctrl.h": "c"
   },
   "cortex-debug.gdbPath": "gdb-multiarch",

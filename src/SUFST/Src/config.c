@@ -179,7 +179,7 @@ static const config_t config_instance = {
     },
     .rtos = {
         .rtcan_s_priority = 3,
-        .rtcan_c_priority = 2,
+        .rtcan_t_priority = 2,
         .ts_ctrl_thread_priority = 2,
         .tracex_enable = false,
         .driver_ctrl_tick_rate = 100
