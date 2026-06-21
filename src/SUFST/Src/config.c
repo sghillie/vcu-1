@@ -61,7 +61,7 @@ static const config_t config_instance = {
             .min_adc = 98,
             .max_adc = 1418,
             .min_mapped = 0,
-            .max_mapped = 100,
+            .max_mapped = 1000,
             .outside_bounds_fraction = 0.05f
         },
         .apps_2_scs = {
@@ -70,7 +70,7 @@ static const config_t config_instance = {
             .min_adc = 771,
             .max_adc = 2138,
             .min_mapped = 0,
-            .max_mapped = 100,
+            .max_mapped = 1000,
             .outside_bounds_fraction = 0.05f
         },
         .max_discrepancy = 10,
