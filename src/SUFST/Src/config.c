@@ -35,31 +35,31 @@ static const config_t config_instance = {
         .vc_stagger_ticks = SECONDS_TO_TICKS(0.25)
     },
     .apps = {
-	 /*.apps_1_scs = {
-            .hadc = &hadc1,
-            .adc_channel = ADC_CHANNEL_8,
-            .min_adc = 0,
-            .max_adc = 0xFFF,
-            .min_mapped = 0,
-            .max_mapped = 0xFFF,
-            .outside_bounds_fraction = 0.02f
-        },
-        .apps_2_scs = {
-            .hadc = &hadc2,
-            .adc_channel = ADC_CHANNEL_15,
-            .min_adc = 0,
-            .max_adc = 0xFFF,
-            .min_mapped = 0,
-            .max_mapped = 0xFFF,
-            .outside_bounds_fraction = 0.02f
-        },
-        .max_discrepancy = 100000,*/
+	    // .apps_1_scs = {
+        //     .hadc = &hadc1,
+        //     .adc_channel = ADC_CHANNEL_8,
+        //     .min_adc = 0,
+        //     .max_adc = 0xFFF,
+        //     .min_mapped = 0,
+        //     .max_mapped = 0xFFF,
+        //     .outside_bounds_fraction = 0.02f
+        // },
+        // .apps_2_scs = {
+        //     .hadc = &hadc2,
+        //     .adc_channel = ADC_CHANNEL_15,
+        //     .min_adc = 0,
+        //     .max_adc = 0xFFF,
+        //     .min_mapped = 0,
+        //     .max_mapped = 0xFFF,
+        //     .outside_bounds_fraction = 0.02f
+        // },
+        // .max_discrepancy = 100000,
 	 
 	 .apps_1_scs = {
             .hadc = &hadc1,
             .adc_channel = ADC_CHANNEL_8,
-            .min_adc = 98,
-            .max_adc = 1418,
+            .min_adc = 80,
+            .max_adc = 1430,
             .min_mapped = 0,
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.05f
@@ -67,14 +67,13 @@ static const config_t config_instance = {
         .apps_2_scs = {
             .hadc = &hadc2,
             .adc_channel = ADC_CHANNEL_15,
-            .min_adc = 771,
-            .max_adc = 2138,
+            .min_adc = 750,
+            .max_adc = 2200,
             .min_mapped = 0,
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.05f
         },
-        .max_discrepancy = 10,
-	
+        .max_discrepancy = 70, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
     },
     .bps = {
         .scs = {
