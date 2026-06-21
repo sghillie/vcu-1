@@ -667,7 +667,7 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         // TODO: add ready to drive state?
         states->sensors.vcu_sagl = ctrl_ptr->sagl_reading;
         states->sensors.vcu_torque_request = ctrl_ptr->torque_request;
-        states->temps.vcu_max_temp = (int8_t) ctrl_ptr->max_temp;
+        states->temps.vcu_max_temp = ctrl_ptr->max_temp;
         states->state.vcu_ctrl_state = (uint8_t) ctrl_ptr->state;
         states->state.vcu_drs_active = ctrl_ptr->shdn_reading;
         states->errors.vcu_ctrl_error = ctrl_ptr->error;

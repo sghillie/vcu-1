@@ -28,7 +28,7 @@ status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
     remote_ctrl_ptr->config_ptr = config_ptr;
     remote_ctrl_ptr->rtcan_s_ptr = rtcan_s_prt;
     remote_ctrl_ptr->canbc_ptr = canbc_ptr;
-    can_s_vcu_simulate_init(&remote_ctrl_ptr->requests);
+    remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){0};
 
     status_t status = STATUS_OK;
 
@@ -301,7 +301,7 @@ void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr)
 {
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
-        can_s_vcu_simulate_init(&remote_ctrl_ptr->requests);
+        remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){0};
         unlock_sim_sensors(remote_ctrl_ptr);
     }
     else
