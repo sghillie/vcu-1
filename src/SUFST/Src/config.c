@@ -187,6 +187,16 @@ static const config_t config_instance = {
         .run_apps_testbench = false,
         .run_fault_state_testbench = false,
         .apps_testbench_laps = 1
+    },
+    .wheelspeed = {
+        .thread = {
+            .name = "WHEELSPEED",
+            .priority = 16,
+            .stack_size = 1024,
+        },
+        .ticks_per_wheel = 40,
+        .wheel_circumference_meters = 1.276096,
+        .sample_period_ticks = SECONDS_TO_TICKS(0.1)
     }
 };
 

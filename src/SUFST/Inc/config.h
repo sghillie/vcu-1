@@ -202,6 +202,14 @@ typedef struct
      uint8_t apps_testbench_laps;
 } config_testbenches;
 
+typedef struct
+{
+     config_thread_t thread;
+     uint8_t ticks_per_wheel;
+     float wheel_circumference_meters;
+     uint32_t sample_period_ticks;
+} config_wheelspeed_t;
+
 /**
  * @brief   VCU configuration
  * 
@@ -225,6 +233,7 @@ typedef struct {
      config_log_t log;
      config_rtos_t rtos;
      config_testbenches testbenches;
+     config_wheelspeed_t wheelspeed;
 } config_t;
 
 /*

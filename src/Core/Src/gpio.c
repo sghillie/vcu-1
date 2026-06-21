@@ -105,12 +105,6 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOO_HOT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IMU_INTR1_Pin IMU_INTR2_Pin */
-  GPIO_InitStruct.Pin = IMU_INTR1_Pin|IMU_INTR2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
   /*Configure GPIO pins : IMU_ADDR_Pin LS_LED_6_Pin */
   GPIO_InitStruct.Pin = IMU_ADDR_Pin|LS_LED_6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -125,10 +119,14 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : WHEELSPEED_RR_Pin WHEELSPEED_RL_Pin WHEELSPEED_FR_Pin WHEELSPEED_FL_Pin
-                           SPARE_IN_3_Pin GPS_PPS_Pin SPARE_IN_2_Pin */
-  GPIO_InitStruct.Pin = WHEELSPEED_RR_Pin|WHEELSPEED_RL_Pin|WHEELSPEED_FR_Pin|WHEELSPEED_FL_Pin
-                          |SPARE_IN_3_Pin|GPS_PPS_Pin|SPARE_IN_2_Pin;
+  /*Configure GPIO pins : WHEELSPEED_RR_Pin WHEELSPEED_RL_Pin WHEELSPEED_FR_Pin WHEELSPEED_FL_Pin */
+  GPIO_InitStruct.Pin = WHEELSPEED_RR_Pin|WHEELSPEED_RL_Pin|WHEELSPEED_FR_Pin|WHEELSPEED_FL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SPARE_IN_3_Pin GPS_PPS_Pin SPARE_IN_2_Pin */
+  GPIO_InitStruct.Pin = SPARE_IN_3_Pin|GPS_PPS_Pin|SPARE_IN_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -168,6 +166,13 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 

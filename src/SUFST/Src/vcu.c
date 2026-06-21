@@ -14,6 +14,7 @@
 #include "bps.h"
 #include "config.h"
 #include "dash.h"
+#include "wheelspeed.h"
 
 /**
  * @brief       Initialises the VCU and all system services
@@ -154,6 +155,15 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                                 &vcu_ptr->config_ptr->heartbeat);
     }
 
+    // wheelspeed
+    if (status == STATUS_OK)
+    {
+        status = wheelspeed_init(&vcu_ptr->wheelspeed,
+                                 &vcu_ptr->rtcan_s,
+                                 app_mem_pool,
+                                 &vcu_ptr->config_ptr->wheelspeed);
+    }
+
     if (status != STATUS_OK)
         LOG_ERROR("Some services failed to initialise\n");
 
@@ -254,4 +264,15 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
     }
 
     return STATUS_OK;
+}
+
+/**
+ * @brief       Handles GPIO EXTI callbacks (e.g. wheelspeed sensors)
+ *
+ * @param[in]   vcu_ptr     VCU instance
+ * @param[in]   gpio_pin    GPIO pin that triggered the interrupt
+ */
+void vcu_handle_gpio_exti(vcu_context_t *vcu_ptr, uint16_t gpio_pin)
+{
+    wheelspeed_handle_exti(&vcu_ptr->wheelspeed, gpio_pin);
 }

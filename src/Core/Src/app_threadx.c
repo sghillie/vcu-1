@@ -157,4 +157,9 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef* can_h)
     vcu_handle_can_err(&vcu, can_h);
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    vcu_handle_gpio_exti(&vcu, GPIO_Pin);
+}
+
 /* USER CODE END 1 */
