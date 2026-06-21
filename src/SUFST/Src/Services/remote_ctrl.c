@@ -56,11 +56,15 @@ status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
     // create CAN receive queue
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_queue_create(&remote_ctrl_ptr->can_rx_queue,
-                                    NULL,
-                                    TX_1_ULONG,
-                                    remote_ctrl_ptr->can_rx_queue_mem,
-                                    sizeof(remote_ctrl_ptr->can_rx_queue_mem));
+        if (rtcan_os_queue_create(&remote_ctrl_ptr->can_rx_queue,
+                                  NULL,
+                                  sizeof(rtcan_msg_t*),
+                                  REMOTE_CTRL_RX_QUEUE_SIZE,
+                                  remote_ctrl_ptr->can_rx_queue_mem,
+                                  sizeof(remote_ctrl_ptr->can_rx_queue_mem)) != RTCAN_OS_OK)
+        {
+            tx_status = TX_START_ERROR;
+        }
     }
 
     // create state mutex
@@ -94,7 +98,7 @@ static void remote_ctrl_thread_entry(ULONG input)
 
             rtcan_status_t status = rtcan_subscribe(remote_ctrl_ptr->rtcan_s_ptr,
                                                     rtcan_channel,
-                                                    &remote_ctrl_ptr->can_rx_queue);
+                                                    remote_ctrl_ptr->can_rx_queue);
 
             if (status != RTCAN_OK)
             {
@@ -105,11 +109,11 @@ static void remote_ctrl_thread_entry(ULONG input)
             while (1)
             {
                 rtcan_msg_t *msg_ptr = NULL;
-                UINT status = tx_queue_receive(&remote_ctrl_ptr->can_rx_queue,
-                                            &msg_ptr,
-                                            config_ptr->broadcast_timeout_ticks);
+                rtcan_osal_status_t status = rtcan_os_queue_receive(remote_ctrl_ptr->can_rx_queue,
+                                                                    &msg_ptr,
+                                                                    config_ptr->broadcast_timeout_ticks);
 
-                if (status == TX_SUCCESS && msg_ptr != NULL)
+                if (status == RTCAN_OS_OK && msg_ptr != NULL)
                 {
                     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
                     {
@@ -123,26 +127,14 @@ static void remote_ctrl_thread_entry(ULONG input)
                         LOG_ERROR( "Error locking sensors\n");
                     }
                 }
-                else if (status != TX_SUCCESS && msg_ptr == NULL)
-                {
-                    if (status == TX_QUEUE_EMPTY)
-                    {
-                        LOG_ERROR("TX Broadcast Error & Msg_ptr is null\n");
-                    }
-                    else
-                    {
-                        LOG_ERROR("TX Error & Msg_ptr is null\n");
-                    }
-                    reset_remote_ctrl_requests(remote_ctrl_ptr);
-                }
-                else if (status == TX_QUEUE_EMPTY)
+                else if (status == RTCAN_OS_TIMEOUT)
                 {
                     LOG_ERROR("Broadcast timeout\n");
                     reset_remote_ctrl_requests(remote_ctrl_ptr);
                 }
                 else
                 {
-                    LOG_ERROR("Broadcast Error\n");
+                    LOG_ERROR("Broadcast Error: %d\n", status);
                     reset_remote_ctrl_requests(remote_ctrl_ptr);
                 }
                 remote_ctrl_update_canbc_states(remote_ctrl_ptr);

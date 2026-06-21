@@ -86,11 +86,15 @@ status_t pm100_init(pm100_context_t* pm100_ptr,
     // create CAN receive queue
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_queue_create(&pm100_ptr->can_rx_queue,
-                                    NULL,
-                                    TX_1_ULONG,
-                                    pm100_ptr->can_rx_queue_mem,
-                                    sizeof(pm100_ptr->can_rx_queue_mem));
+        if (rtcan_os_queue_create(&pm100_ptr->can_rx_queue,
+                                  NULL,
+                                  sizeof(rtcan_msg_t*),
+                                  PM100_RX_QUEUE_SIZE,
+                                  pm100_ptr->can_rx_queue_mem,
+                                  sizeof(pm100_ptr->can_rx_queue_mem)) != RTCAN_OS_OK)
+        {
+            tx_status = TX_START_ERROR;
+        }
     }
 
     // create state mutex
@@ -141,7 +145,7 @@ void pm100_thread_entry(ULONG input)
     {
         rtcan_status_t status = rtcan_subscribe(pm100_ptr->rtcan_t_ptr,
                                                 subscriptions[i],
-                                                &pm100_ptr->can_rx_queue);
+                                                pm100_ptr->can_rx_queue);
 
         if (status != RTCAN_OK)
         {
@@ -154,18 +158,18 @@ void pm100_thread_entry(ULONG input)
     while (1)
     {
         rtcan_msg_t* msg_ptr = NULL;
-        UINT status = tx_queue_receive(&pm100_ptr->can_rx_queue,
-                                       &msg_ptr,
-                                       config_ptr->broadcast_timeout_ticks);
+        rtcan_osal_status_t status = rtcan_os_queue_receive(pm100_ptr->can_rx_queue,
+                                                            &msg_ptr,
+                                                            config_ptr->broadcast_timeout_ticks);
 
-        if (status == TX_QUEUE_EMPTY)
+        if (status == RTCAN_OS_TIMEOUT)
         {
             // timed out
             // TODO: error
             pm100_ptr->broadcasts_valid = false;
             LOG_INFO("PM100 broadcast timeout\n");
         }
-        else if (status == TX_SUCCESS && msg_ptr != NULL)
+        else if (status == RTCAN_OS_OK && msg_ptr != NULL)
         {
             pm100_ptr->broadcasts_valid = true;
             process_broadcast(pm100_ptr, msg_ptr);

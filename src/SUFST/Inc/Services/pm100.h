@@ -40,8 +40,8 @@ typedef struct
      TX_THREAD thread;
      rtcan_handle_t* rtcan_t_ptr;
      rtcan_handle_t* rtcan_s_ptr;
-     TX_QUEUE can_rx_queue;
-     ULONG can_rx_queue_mem[PM100_RX_QUEUE_SIZE];
+     rtcan_queue_t can_rx_queue;
+     uint32_t can_rx_queue_mem[RTCAN_OS_QUEUE_MEM_SIZE(PM100_RX_QUEUE_SIZE, sizeof(rtcan_msg_t*)) / sizeof(uint32_t)];
      TX_MUTEX state_mutex;
      bool broadcasts_valid;
      struct can_t_pm100_internal_states_t states;

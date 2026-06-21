@@ -29,8 +29,8 @@ typedef struct
     const config_remote_ctrl_t *config_ptr;
     canbc_context_t *canbc_ptr;
     rtcan_handle_t *rtcan_s_ptr;
-    TX_QUEUE can_rx_queue;
-    ULONG can_rx_queue_mem[REMOTE_CTRL_RX_QUEUE_SIZE];
+    rtcan_queue_t can_rx_queue;
+    uint32_t can_rx_queue_mem[RTCAN_OS_QUEUE_MEM_SIZE(REMOTE_CTRL_RX_QUEUE_SIZE, sizeof(rtcan_msg_t*)) / sizeof(uint32_t)];
 
     struct can_s_vcu_simulation_t requests;
     bool brakelight_pwr;
