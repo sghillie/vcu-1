@@ -664,13 +664,14 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
 
     if (states != NULL)
     {
-        // TODO: add ready to drive state?
+        states->state.vcu_r2_d = (ctrl_ptr->state == CTRL_STATE_TS_ON);
         states->sensors.vcu_sagl = ctrl_ptr->sagl_reading;
         states->sensors.vcu_torque_request = ctrl_ptr->torque_request;
         states->temps.vcu_max_temp = ctrl_ptr->max_temp;
         states->state.vcu_ctrl_state = (uint8_t) ctrl_ptr->state;
         states->state.vcu_drs_active = ctrl_ptr->shdn_reading;
         states->errors.vcu_ctrl_error = ctrl_ptr->error;
+        states->errors.vcu_pm100_error = ctrl_ptr->pm100_ptr->error;
         states->pdm.inverter = ctrl_ptr->inverter_pwr;
         states->pdm.pump = ctrl_ptr->pump_pwr;
         states->pdm.fan = ctrl_ptr->fan_pwr;

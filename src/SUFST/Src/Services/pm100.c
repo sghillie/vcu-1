@@ -145,9 +145,7 @@ void pm100_thread_entry(ULONG input)
 
         if (status != RTCAN_OK)
         {
-            // TODO: update broadcast states with error
-            LOG_ERROR(
-                "Could not subscribe on %d message. Terminating thread\n");
+            LOG_ERROR("Could not subscribe on %d message. Terminating thread\n");
             tx_thread_terminate(&pm100_ptr->thread);
         }
     }
