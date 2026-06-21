@@ -1,5 +1,12 @@
 #include "apps.h"
 
+static const char* scs_label(status_t status, scs_status_t verbose)
+{
+    if (status != STATUS_OK)
+        return verbose == STATUS_THRESHOLD_ERROR ? "TERR" : "ERR";
+    return verbose == STATUS_THRESHOLD_WARNING ? "WARN" : "OK";
+}
+
 /**
  * @brief       Initialises the APPS
  *
@@ -60,54 +67,31 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
 
     if (status_1 != STATUS_OK)
     {
-        if (status_1_verbose == STATUS_THRESHOLD_ERROR)
-        {
-            LOG_INFO("APPS1 threshold error; ");
-        }
-        else
-        {
-            LOG_INFO("APPS1 unknown error; ");
-        }
         status = STATUS_ERROR;
         apps_ptr->scs_error |= SCS_ERROR_APPS1;
     }
-    else if (status_1_verbose == STATUS_THRESHOLD_WARNING)
-    {
-        LOG_INFO("APPS1 threshold warning; ");
-    }
-
-    LOG_INFO("APPS1 reading: %d; ", reading_1);
 
     if (status_2 != STATUS_OK)
     {
-        if (status_2_verbose == STATUS_THRESHOLD_ERROR)
-        {
-            LOG_INFO("APPS2 threshold error; ");
-        }
-        else
-        {
-            LOG_INFO("APPS2 unknown error; ");
-        }
         status = STATUS_ERROR;
         apps_ptr->scs_error |= SCS_ERROR_APPS2;
     }
-    else if (status_2_verbose == STATUS_THRESHOLD_WARNING)
-    {
-        LOG_INFO("APPS2 threshold warning; ");
-    }
 
-    LOG_INFO("APPS2 reading: %d; ", reading_2);
-
-    // // check for discrepancy
+    // check for discrepancy
     uint16_t diff = (reading_1 > reading_2) ? (reading_1 - reading_2)
                                             : (reading_2 - reading_1);
 
     if (diff > apps_ptr->config_ptr->max_discrepancy)
     {
-        LOG_INFO("DIFF error; ");
         status = STATUS_ERROR;
         apps_ptr->scs_error |= SCS_ERROR_APPS_DISCREPANCY;
     }
+
+    LOG_INFO("APPS A1:%d[%s] A2:%d[%s] diff:%d%s\n",
+             reading_1, scs_label(status_1, status_1_verbose),
+             reading_2, scs_label(status_2, status_2_verbose),
+             diff,
+             diff > apps_ptr->config_ptr->max_discrepancy ? "[!]" : "");
 
     // return reading
     if (status == STATUS_OK)
@@ -118,8 +102,6 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     {
         *reading_ptr = 0;
     }
-
-    LOG_INFO("\n");
 
     return status;
 }
