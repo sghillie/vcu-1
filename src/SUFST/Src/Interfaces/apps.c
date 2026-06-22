@@ -85,13 +85,17 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     {
         status = STATUS_ERROR;
         apps_ptr->scs_error |= SCS_ERROR_APPS_DISCREPANCY;
+        
+        LOG_WARN("APPS A1:%d[%s] A2:%d[%s] diff:%d[!]\n",
+                reading_1, scs_label(status_1, status_1_verbose),
+                reading_2, scs_label(status_2, status_2_verbose),
+                diff);
+    } else {
+        LOG_DEBUG("APPS A1:%d[%s] A2:%d[%s] diff:%d\n",
+                reading_1, scs_label(status_1, status_1_verbose),
+                reading_2, scs_label(status_2, status_2_verbose),
+                diff);
     }
-
-    LOG_INFO("APPS A1:%d[%s] A2:%d[%s] diff:%d%s\n",
-             reading_1, scs_label(status_1, status_1_verbose),
-             reading_2, scs_label(status_2, status_2_verbose),
-             diff,
-             diff > apps_ptr->config_ptr->max_discrepancy ? "[!]" : "");
 
     // return reading
     if (status == STATUS_OK)
