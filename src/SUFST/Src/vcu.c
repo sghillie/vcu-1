@@ -10,12 +10,6 @@
 
 #include <stdbool.h>
 
-#include "apps.h"
-#include "bps.h"
-#include "config.h"
-#include "dash.h"
-#include "wheelspeed.h"
-
 /**
  * @brief       Initialises the VCU and all system services
  *
@@ -162,6 +156,14 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                                  &vcu_ptr->rtcan_s,
                                  app_mem_pool,
                                  &vcu_ptr->config_ptr->wheelspeed);
+    }
+
+    // sd card
+    if (status == STATUS_OK)
+    {
+        status = sd_init(&vcu_ptr->sd,
+                         app_mem_pool,
+                         &vcu_ptr->config_ptr->sd);
     }
 
     if (status != STATUS_OK)

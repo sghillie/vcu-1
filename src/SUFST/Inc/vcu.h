@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include <tx_api.h>
 
+#include "apps.h"
+#include "bps.h"
 #include "canbc.h"
 #include "config.h"
 #include "ctrl.h"
@@ -24,6 +26,7 @@
 #include "status.h"
 #include "remote_ctrl.h"
 #include "wheelspeed.h"
+#include "sd_logging.h"
 
 /**
  * @brief       VCU context
@@ -43,6 +46,7 @@ typedef struct
      heartbeat_context_t heartbeat;    // heartbeat service
      wheelspeed_context_t wheelspeed;  // wheelspeed service
      log_context_t log;                // logging service
+     sd_context_t sd;                  // sd card service
      uint32_t err;                     // current error code
      const config_t* config_ptr;       // pointer to global VCU configuration
 

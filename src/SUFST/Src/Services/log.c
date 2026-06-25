@@ -17,6 +17,7 @@
 
 #include "config.h"
 #include "rs232.h"
+#include "sd_logging.h"
 #include "status.h"
 
 // internal function prototype
@@ -186,22 +187,29 @@ void log_thread_entry(ULONG thread_input)
             log_ptr->error &= ~LOG_ERROR_MUTEX;
         }
 
-        // print the message (uart -> rs232, then usart -> debug header)
+        // print the message over UART (-> rs232)
         HAL_StatusTypeDef uart_status = HAL_OK;
-        if (log_ptr->config_ptr->uart != NULL) {
+        if (log_ptr->config_ptr->uart != NULL)
+        {
             uart_status = HAL_UART_Transmit(log_ptr->config_ptr->uart,
                                             (const uint8_t*) log_msg_to_send,
                                             strlen(log_msg_to_send),
                                             HAL_MAX_DELAY);
         }
 
+        // print the message over USART (-> debug header)
         HAL_StatusTypeDef usart_status = HAL_OK;
-        if (log_ptr->config_ptr->usart != NULL) {
+        if (log_ptr->config_ptr->usart != NULL)
+        {
             usart_status = HAL_USART_Transmit(log_ptr->config_ptr->usart,
                                               (const uint8_t*) log_msg_to_send,
                                               strlen(log_msg_to_send),
                                               HAL_MAX_DELAY);
         }
+
+        // if level >= sd_min_level write to SD card
+        if (msg.level >= log_ptr->config_ptr->min_sd_log_level)
+            write_sd_log_line(log_msg_to_send);
 
         // unlock the UART mutex
         tx_status = tx_mutex_put(&log_ptr->uart_mutex);

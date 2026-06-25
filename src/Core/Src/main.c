@@ -21,11 +21,11 @@
 #include "main.h"
 #include "adc.h"
 #include "can.h"
+#include "dma.h"
 #include "i2c.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
-#include "usb_otg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -105,6 +105,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
@@ -115,7 +116,6 @@ int main(void)
   MX_TIM12_Init();
   MX_UART8_Init();
   MX_USART1_Init();
-  MX_USB_OTG_FS_PCD_Init();
   MX_TIM10_Init();
   MX_TIM11_Init();
   MX_ADC2_Init();
@@ -265,8 +265,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

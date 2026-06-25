@@ -164,7 +164,8 @@ static const config_t config_instance = {
             .priority = 10,
             .stack_size = 512
         },
-        .blink_period_ticks = SECONDS_TO_TICKS(0.25)
+        .blink_period_ticks = SECONDS_TO_TICKS(0.25),
+        .fast_blink_period_ticks = SECONDS_TO_TICKS(0.05)
     },
     .log = {
         .thread = {
@@ -172,9 +173,19 @@ static const config_t config_instance = {
             .priority = 15,
             .stack_size = 1024,
         },
-        .min_level = LOG_LEVEL_DEBUG,
+        .min_level = LOG_LEVEL_INFO,
+        .min_sd_log_level = LOG_LEVEL_INFO,
         .uart = &huart8,
-        .usart = &husart1
+        .usart = &husart1,
+    },
+    .sd = {
+        .thread = {
+            .name = "SD",
+            .priority = 16,
+            .stack_size = 8192,
+        },
+        .enable = true,
+        .flush_period_ticks = SECONDS_TO_TICKS(10)
     },
     .rtos = {
         .rtcan_s_priority = 3,

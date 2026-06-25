@@ -86,11 +86,17 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SD_CARD_DETECT_Pin RS232_BAD_Pin */
-  GPIO_InitStruct.Pin = SD_CARD_DETECT_Pin|RS232_BAD_Pin;
+  /*Configure GPIO pin : SD_CARD_DETECT_Pin */
+  GPIO_InitStruct.Pin = SD_CARD_DETECT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(SD_CARD_DETECT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : RS232_BAD_Pin */
+  GPIO_InitStruct.Pin = RS232_BAD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  HAL_GPIO_Init(RS232_BAD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : RS232_FORCEOFF_Pin RS232_FORCEON_Pin IMU_MODE_Pin EEPROM_WC_Pin */
   GPIO_InitStruct.Pin = RS232_FORCEOFF_Pin|RS232_FORCEON_Pin|IMU_MODE_Pin|EEPROM_WC_Pin;

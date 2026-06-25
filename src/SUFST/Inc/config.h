@@ -145,6 +145,7 @@ typedef struct
 {
      config_thread_t thread;                 // thread config
      uint32_t blink_period_ticks;            // period to blink the LED
+     uint32_t fast_blink_period_ticks;       // period to blink in fast mode
 } config_heartbeat_t;
 
 typedef struct
@@ -182,6 +183,7 @@ typedef struct
 {
      config_thread_t thread;
      config_log_level_t min_level;
+     config_log_level_t min_sd_log_level;
      UART_HandleTypeDef *uart;
      USART_HandleTypeDef *usart;
 } config_log_t;
@@ -210,6 +212,13 @@ typedef struct
      uint32_t sample_period_ticks;
 } config_wheelspeed_t;
 
+typedef struct
+{
+     config_thread_t thread;
+     bool enable;
+     uint32_t flush_period_ticks;
+} config_sd_t;
+
 /**
  * @brief   VCU configuration
  * 
@@ -234,6 +243,7 @@ typedef struct {
      config_rtos_t rtos;
      config_testbenches testbenches;
      config_wheelspeed_t wheelspeed;
+     config_sd_t sd;
 } config_t;
 
 /*
