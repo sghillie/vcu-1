@@ -96,6 +96,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
         return;
     }
 
+    canbc_h->states.state.vcu_rolling_counter++;
     canbc_states_t snapshot = canbc_h->states;
     tx_mutex_put(&canbc_h->state_mutex);
 
