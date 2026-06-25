@@ -53,7 +53,10 @@ void MX_USB_OTG_FS_PCD_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USB_OTG_FS_Init 2 */
-
+  /* HAL_PCD_Init leaves EP TX FIFOs at 0 depth, causing continuous TXFE interrupts. */
+  HAL_PCDEx_SetRxFiFo(&hpcd_USB_OTG_FS, 0x80);    /* RX:     128 words (512 B) */
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 0, 0x40); /* EP0 TX:  64 words (256 B) */
+  HAL_PCDEx_SetTxFiFo(&hpcd_USB_OTG_FS, 1, 0x80); /* EP1 TX: 128 words (512 B) */
   /* USER CODE END USB_OTG_FS_Init 2 */
 
 }

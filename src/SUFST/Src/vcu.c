@@ -35,6 +35,22 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
         status = log_init(&vcu_ptr->log, app_mem_pool, &vcu_ptr->config_ptr->log);
     }
 
+    // heartbeat
+    if (status == STATUS_OK)
+    {
+        status = heartbeat_init(&vcu_ptr->heartbeat,
+                                app_mem_pool,
+                                &vcu_ptr->config_ptr->heartbeat);
+    }
+
+    // enter USB mass storage mode if requested
+    if (status == STATUS_OK && usb_mass_storage_mode_button_held())
+    {
+        return usb_msc_init(&vcu_ptr->usb_msc,
+                            app_mem_pool,
+                            &vcu_ptr->config_ptr->usb_msc);
+    }
+
     // RTCAN services
     rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t};
     CAN_HandleTypeDef *can_handles[] = {can_s_h, can_t_h};
@@ -139,14 +155,6 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
             app_mem_pool,
             &vcu_ptr->rtcan_s,
             &vcu_ptr->config_ptr->remote_ctrl);
-    }
-
-    // heartbeat
-    if (status == STATUS_OK)
-    {
-        status = heartbeat_init(&vcu_ptr->heartbeat,
-                                app_mem_pool,
-                                &vcu_ptr->config_ptr->heartbeat);
     }
 
     // wheelspeed

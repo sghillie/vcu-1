@@ -25,6 +25,7 @@
 #include "tick.h"
 #include "status.h"
 #include "remote_ctrl.h"
+#include "usb_mass_storage_mode.h"
 #include "wheelspeed.h"
 #include "sd_logging.h"
 
@@ -47,6 +48,7 @@ typedef struct
      wheelspeed_context_t wheelspeed;  // wheelspeed service
      log_context_t log;                // logging service
      sd_context_t sd;                  // sd card service
+     usb_msc_context_t usb_msc;        // USB mass storage service
      uint32_t err;                     // current error code
      const config_t* config_ptr;       // pointer to global VCU configuration
 

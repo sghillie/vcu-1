@@ -8,9 +8,8 @@
 
 #include "io.h"
 
-/*
- * internal function prototypes
- */
+static heartbeat_context_t *global_heartbeat_context;
+
 static void heartbeat_thread_entry(ULONG input);
 
 /**
@@ -47,7 +46,17 @@ status_t heartbeat_init(heartbeat_context_t *heartbeat_h,
                                      TX_AUTO_START);
     }
 
-    return (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
+    if (tx_status != TX_SUCCESS)
+        return STATUS_ERROR;
+
+    global_heartbeat_context = heartbeat_h;
+    return STATUS_OK;
+}
+
+void heartbeat_set_fast(void)
+{
+    if (global_heartbeat_context != NULL)
+        global_heartbeat_context->fast_mode = true;
 }
 
 /**
@@ -66,10 +75,11 @@ static void heartbeat_thread_entry(ULONG input)
     // main loop
     while (1)
     {
-        // toggle LED
         VCU_Output_Toggle(ROB_LED_GPIO_Port, ROB_LED_Pin);
 
-        // wait
-        tx_thread_sleep(heartbeat_h->config_ptr->blink_period_ticks);
+        ULONG period = heartbeat_h->fast_mode
+            ? heartbeat_h->config_ptr->fast_blink_period_ticks
+            : heartbeat_h->config_ptr->blink_period_ticks;
+        tx_thread_sleep(period);
     }
 }

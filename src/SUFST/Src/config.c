@@ -208,6 +208,13 @@ static const config_t config_instance = {
         .ticks_per_wheel = 40,
         .wheel_circumference_meters = 1.276096,
         .sample_period_ticks = SECONDS_TO_TICKS(0.1)
+    },
+    .usb_msc = {
+        .thread = {
+            .name = "USB_MSC",
+            .priority = 5,
+            .stack_size = 8192
+        }
     }
 };
 

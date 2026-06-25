@@ -219,6 +219,10 @@ typedef struct
      uint32_t flush_period_ticks;
 } config_sd_t;
 
+typedef struct {
+     config_thread_t thread;
+} config_usb_msc_t;
+
 /**
  * @brief   VCU configuration
  * 
@@ -244,6 +248,7 @@ typedef struct {
      config_testbenches testbenches;
      config_wheelspeed_t wheelspeed;
      config_sd_t sd;
+     config_usb_msc_t usb_msc;
 } config_t;
 
 /*
