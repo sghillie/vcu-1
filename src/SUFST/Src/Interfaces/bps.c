@@ -40,20 +40,20 @@ status_t bps_read(bps_context_t* bps_ptr, uint16_t* reading_ptr)
     {
         if (status_verbose == STATUS_THRESHOLD_ERROR)
         {
-            LOG_INFO("BPS threshold error; ");
+            LOG_INFO("BPS threshold error;\n");
         }
         else
         {
-            LOG_INFO("BPS unknown error; ");
+            LOG_INFO("BPS unknown error;\n");
         }
         status = STATUS_ERROR;
     }
     else if (status_verbose == STATUS_THRESHOLD_WARNING)
     {
-        LOG_INFO("BPS threshold warning; ");
+        LOG_INFO("BPS threshold warning;\n");
     }
 
-    // LOG_INFO("BPS reading: %d; ", *reading_ptr);
+    // LOG_INFO("BPS reading: %d;\n", *reading_ptr);
 
     return status;
 }
