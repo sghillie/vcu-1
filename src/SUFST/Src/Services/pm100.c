@@ -239,11 +239,6 @@ void process_broadcast(pm100_context_t* pm100_ptr, const rtcan_msg_t* msg_ptr)
                                              msg_ptr->length);
 
         break;
-        can_t_pm100_temperature_set_2_unpack(&pm100_ptr->temp2,
-                                             msg_ptr->data,
-                                             msg_ptr->length);
-
-        break;
     }
 
     case CAN_T_PM100_TEMPERATURE_SET_3_FRAME_ID:
