@@ -335,6 +335,7 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
                     pm100_disable(ctrl_ptr->pm100_ptr);
                     rtds_activate(ctrl_ptr->rtds_config_ptr);
                     ctrl_ptr->pump_pwr = 1;
+                    ctrl_ptr->apps_bps_start = tx_time_get();
 
 #ifdef VCU_SIMULATION_MODE
                     next_state = CTRL_STATE_SIM_WAIT_R2D_ON;
@@ -603,6 +604,7 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
         }
         if (!dash_ptr->r2d_flag)
         {
+            ctrl_ptr->apps_bps_start = tx_time_get();
             next_state = CTRL_STATE_TS_ON;
         }
         break;
