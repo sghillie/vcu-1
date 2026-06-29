@@ -75,7 +75,7 @@ UINT App_ThreadX_Init(VOID *memory_ptr)
   // initialise system
   if (ret == TX_SUCCESS)
   {
-    status_t status = vcu_init(&vcu, &hcan1, &hcan2, byte_pool, config_get());
+    status_t status = vcu_init(&vcu, &hcan2, &hcan1, byte_pool, config_get());
 
     if (status != STATUS_OK)
     {
