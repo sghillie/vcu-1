@@ -89,8 +89,8 @@ void Error_Handler(void);
 #define SAGL_ADC_GPIO_Port GPIOA
 #define BPS_R_ADC_Pin GPIO_PIN_7
 #define BPS_R_ADC_GPIO_Port GPIOA
-#define BPS_ADC_Pin GPIO_PIN_4
-#define BPS_ADC_GPIO_Port GPIOC
+#define BPS_F_ADC_Pin GPIO_PIN_4
+#define BPS_F_ADC_GPIO_Port GPIOC
 #define APPS_2_ADC_Pin GPIO_PIN_5
 #define APPS_2_ADC_GPIO_Port GPIOC
 #define APPS_1_ADC_Pin GPIO_PIN_0

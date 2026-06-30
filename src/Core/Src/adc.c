@@ -150,10 +150,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = BPS_ADC_Pin;
+    GPIO_InitStruct.Pin = BPS_F_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(BPS_ADC_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(BPS_F_ADC_GPIO_Port, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = APPS_1_ADC_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -215,7 +215,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     */
     HAL_GPIO_DeInit(GPIOA, DASH_ROTARY_ADC_Pin|CT_ADC_Pin|SAGL_ADC_Pin|BPS_R_ADC_Pin);
 
-    HAL_GPIO_DeInit(BPS_ADC_GPIO_Port, BPS_ADC_Pin);
+    HAL_GPIO_DeInit(BPS_F_ADC_GPIO_Port, BPS_F_ADC_Pin);
 
     HAL_GPIO_DeInit(APPS_1_ADC_GPIO_Port, APPS_1_ADC_Pin);
 
