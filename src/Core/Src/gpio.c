@@ -63,7 +63,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOC, RS232_FORCEOFF_Pin|RS232_FORCEON_Pin|IMU_MODE_Pin|EEPROM_WC_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, IMU_ADDR_Pin|LS_LED_6_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, R2D_SIREN_Pin|IMU_ADDR_Pin|LS_LED_6_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SPARE_OUT_7_Pin|SPARE_OUT_6_Pin|SPARE_OUT_5_Pin|SPARE_OUT_4_Pin, GPIO_PIN_RESET);
@@ -111,8 +111,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOO_HOT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IMU_ADDR_Pin LS_LED_6_Pin */
-  GPIO_InitStruct.Pin = IMU_ADDR_Pin|LS_LED_6_Pin;
+  /*Configure GPIO pins : R2D_SIREN_Pin IMU_ADDR_Pin LS_LED_6_Pin */
+  GPIO_InitStruct.Pin = R2D_SIREN_Pin|IMU_ADDR_Pin|LS_LED_6_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
