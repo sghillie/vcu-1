@@ -106,6 +106,9 @@ void tick_update_canbc_states(tick_context_t* tick_ptr)
         states->pdm.brakelight = tick_ptr->brakelight_pwr;
         states->sensors.vcu_apps = tick_ptr->apps_reading;
         states->sensors.vcu_bps = tick_ptr->bps_reading;
+        states->sensors_raw.vcu_apps1_raw = tick_ptr->apps.apps_1_signal.adc_reading;
+        states->sensors_raw.vcu_apps2_raw = tick_ptr->apps.apps_2_signal.adc_reading;
+        states->sensors_raw.vcu_bps_raw = tick_ptr->bps.signal.adc_reading;
         canbc_unlock_state(tick_ptr->canbc_ptr);
     }
 }
