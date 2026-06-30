@@ -100,7 +100,10 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     // return reading
     if (status == STATUS_OK)
     {
-        *reading_ptr = reading_2; //(reading_1 + reading_2) / 2;
+        uint16_t raw = reading_2; //(reading_1 + reading_2) / 2;
+        *reading_ptr = apps_ptr->config_ptr->inverted
+                       ? (apps_ptr->config_ptr->apps_2_scs.max_mapped - raw)
+                       : raw;
     }
     else
     {
