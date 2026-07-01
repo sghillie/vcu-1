@@ -79,11 +79,11 @@ static const config_t config_instance = {
     .bps = {
         .scs = {
             .hadc = &hadc1,
-            .adc_channel = ADC_CHANNEL_7,
-            .min_adc = 0,
-            .max_adc = 350,
+            .adc_channel = ADC_CHANNEL_6,
+            .min_adc = 298,
+            .max_adc = 366,
             .min_mapped = 0,
-            .max_mapped = 200,
+            .max_mapped = 1000,
             .outside_bounds_fraction = 0.05f
         },
         .fully_pressed_fraction = 0.4f
