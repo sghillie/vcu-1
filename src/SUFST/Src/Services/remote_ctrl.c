@@ -241,7 +241,7 @@ uint8_t remote_get_r2d_reading(remote_ctrl_context_t *remote_ctrl_ptr)
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
         result = remote_ctrl_ptr->requests.sim_r2_d;
-        if (!can_s_vcu_state_vcu_r2_d_is_in_range(result))
+        if (!can_t_vcu_state_vcu_r2_d_is_in_range(result))
         {
             LOG_WARN("R2D requested is over the limit, setting it to 0\n");
             result = 0u;

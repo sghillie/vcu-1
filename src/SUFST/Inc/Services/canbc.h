@@ -9,7 +9,7 @@
 #define CANBC_H
 
 #include <can.h>
-#include <can_s.h>
+#include <can_t.h>
 #include <rtcan.h>
 #include <stdint.h>
 #include "log.h"
@@ -28,12 +28,12 @@
  */
 typedef struct
 {
-    struct can_s_vcu_sensors_t sensors;
-    struct can_s_vcu_sensors_raw_t sensors_raw;
-    struct can_s_vcu_temps_t temps;
-    struct can_s_vcu_state_t state;
-    struct can_s_vcu_error_t errors;
-    struct can_s_vcu_pdm_t pdm;
+    struct can_t_vcu_sensors_t sensors;
+    struct can_t_vcu_sensors_raw_t sensors_raw;
+    struct can_t_vcu_temps_t temps;
+    struct can_t_vcu_state_t state;
+    struct can_t_vcu_error_t errors;
+    struct can_t_vcu_pdm_t pdm;
 } canbc_states_t;
 
 /**

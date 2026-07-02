@@ -1,6 +1,6 @@
 #include "canbc.h"
 
-#include <can_s.h>
+#include <can_t.h>
 
 /*
  * internal function prototypes
@@ -102,66 +102,66 @@ static void send_bc_messages(canbc_context_t *canbc_h)
 
     // states
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_STATE_FRAME_ID,
-                                .length = CAN_S_VCU_STATE_LENGTH,
-                                .extended = CAN_S_VCU_STATE_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_STATE_FRAME_ID,
+                                .length = CAN_T_VCU_STATE_LENGTH,
+                                .extended = CAN_T_VCU_STATE_IS_EXTENDED};
 
-        can_s_vcu_state_pack(message.data, &snapshot.state, message.length);
+        can_t_vcu_state_pack(message.data, &snapshot.state, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU state\n");
     }
 
     // sensors
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_SENSORS_FRAME_ID,
-                                .length = CAN_S_VCU_SENSORS_LENGTH,
-                                .extended = CAN_S_VCU_SENSORS_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_SENSORS_FRAME_ID,
+                                .length = CAN_T_VCU_SENSORS_LENGTH,
+                                .extended = CAN_T_VCU_SENSORS_IS_EXTENDED};
 
-        can_s_vcu_sensors_pack(message.data, &snapshot.sensors, message.length);
+        can_t_vcu_sensors_pack(message.data, &snapshot.sensors, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU sensors\n");
     }
 
     // temps
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_TEMPS_FRAME_ID,
-                                .length = CAN_S_VCU_TEMPS_LENGTH,
-                                .extended = CAN_S_VCU_TEMPS_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_TEMPS_FRAME_ID,
+                                .length = CAN_T_VCU_TEMPS_LENGTH,
+                                .extended = CAN_T_VCU_TEMPS_IS_EXTENDED};
 
-        can_s_vcu_temps_pack(message.data, &snapshot.temps, message.length);
+        can_t_vcu_temps_pack(message.data, &snapshot.temps, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU temps\n");
     }
 
     // errors
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_ERROR_FRAME_ID,
-                                .length = CAN_S_VCU_ERROR_LENGTH,
-                                .extended = CAN_S_VCU_ERROR_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_ERROR_FRAME_ID,
+                                .length = CAN_T_VCU_ERROR_LENGTH,
+                                .extended = CAN_T_VCU_ERROR_IS_EXTENDED};
 
-        can_s_vcu_error_pack(message.data, &snapshot.errors, message.length);
+        can_t_vcu_error_pack(message.data, &snapshot.errors, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU errors\n");
     }
 
     // pdm
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_PDM_FRAME_ID,
-                                .length = CAN_S_VCU_PDM_LENGTH,
-                                .extended = CAN_S_VCU_PDM_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_PDM_FRAME_ID,
+                                .length = CAN_T_VCU_PDM_LENGTH,
+                                .extended = CAN_T_VCU_PDM_IS_EXTENDED};
 
-        can_s_vcu_pdm_pack(message.data, &snapshot.pdm, message.length);
+        can_t_vcu_pdm_pack(message.data, &snapshot.pdm, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU PDM\n");
     }
 
     // raw sensors debug
     {
-        rtcan_msg_t message = { .identifier = CAN_S_VCU_SENSORS_RAW_FRAME_ID,
-                                .length = CAN_S_VCU_SENSORS_RAW_LENGTH,
-                                .extended = CAN_S_VCU_SENSORS_RAW_IS_EXTENDED};
+        rtcan_msg_t message = { .identifier = CAN_T_VCU_SENSORS_RAW_FRAME_ID,
+                                .length = CAN_T_VCU_SENSORS_RAW_LENGTH,
+                                .extended = CAN_T_VCU_SENSORS_RAW_IS_EXTENDED};
 
-        can_s_vcu_sensors_raw_pack(message.data, &snapshot.sensors_raw, message.length);
+        can_t_vcu_sensors_raw_pack(message.data, &snapshot.sensors_raw, message.length);
         if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU raw sensors\n");
     }

@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <tx_api.h>
 #include <can_s.h>
+#include <can_t.h>
 #include <rtcan.h>
 
 #include "config.h"
