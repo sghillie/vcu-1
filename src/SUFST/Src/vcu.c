@@ -268,9 +268,10 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 
     if (status != RTCAN_OK)
     {
-        // TODO: error
-        // vcu_h->err |= VCU_ERROR_PERIPHERAL;
-        Error_Handler();
+        vcu_ptr->err |= VCU_ERROR_PERIPHERAL;
+
+        // Note: Do not call Error_Handler() here as the
+        // Entire VCU will crash whenever there is a CAN bus error.
     }
 
     return STATUS_OK;
