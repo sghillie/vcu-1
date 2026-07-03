@@ -52,10 +52,41 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
     }
 
     // RTCAN services
+    static const CAN_FilterTypeDef can_s_filters[] = {
+        {
+            .FilterIdHigh = 0x0000,
+            .FilterIdLow = 0x0000,
+            .FilterMaskIdHigh = 0x0000,
+            .FilterMaskIdLow = 0x0000,
+            .FilterFIFOAssignment = CAN_FILTER_FIFO0,
+            .FilterBank = 0,
+            .FilterMode = CAN_FILTERMODE_IDMASK,
+            .FilterScale = CAN_FILTERSCALE_32BIT,
+            .FilterActivation = CAN_FILTER_ENABLE,
+            .SlaveStartFilterBank = 14,
+        },
+    };
+    static const CAN_FilterTypeDef can_t_filters[] = {
+        {
+            .FilterIdHigh = 0x0000,
+            .FilterIdLow = 0x0000,
+            .FilterMaskIdHigh = 0x0000,
+            .FilterMaskIdLow = 0x0000,
+            .FilterFIFOAssignment = CAN_FILTER_FIFO0,
+            .FilterBank = 14,
+            .FilterMode = CAN_FILTERMODE_IDMASK,
+            .FilterScale = CAN_FILTERSCALE_32BIT,
+            .FilterActivation = CAN_FILTER_ENABLE,
+            .SlaveStartFilterBank = 14,
+        },
+    };
+
     rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t};
     CAN_HandleTypeDef *can_handles[] = {can_s_h, can_t_h};
     uint32_t rtcan_priorities[] = {vcu_ptr->config_ptr->rtos.rtcan_s_priority,
                                    vcu_ptr->config_ptr->rtos.rtcan_t_priority};
+    const CAN_FilterTypeDef *rtcan_filters[] = {can_s_filters, can_t_filters};
+    uint32_t rtcan_filter_counts[] = {1U, 1U};
 
     for (uint32_t i = 0; i < 2; i++)
     {
@@ -67,8 +98,8 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                 .rx_thread_stack_size = 0U,
                 .tx_thread_stack_mem = NULL,
                 .rx_thread_stack_mem = NULL,
-                .filters = NULL,
-                .filter_count = 0U,
+                .filters = rtcan_filters[i],
+                .filter_count = rtcan_filter_counts[i],
             };
 
             rtcan_status_t rtcan_status = rtcan_init(rtcan_handles[i],
