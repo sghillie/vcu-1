@@ -227,7 +227,7 @@ status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr,
     {
         // TODO: error
         // vcu_h->err |= VCU_ERROR_PERIPHERAL;
-        Error_Handler();
+        // Error_Handler();
     }
 
     status = rtcan_handle_tx_mailbox_callback(&vcu_ptr->rtcan_s, can_h);
@@ -236,7 +236,7 @@ status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr,
     {
         // TODO: error
         // vcu_h->err |= VCU_ERROR_PERIPHERAL;
-        Error_Handler();
+        // Error_Handler();
     }
 
     return STATUS_OK; //? Error_Handler() never returns so this can only return
@@ -299,7 +299,7 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 
     if (status != RTCAN_OK)
     {
-        vcu_ptr->err |= VCU_ERROR_PERIPHERAL;
+        // vcu_ptr->err |= VCU_OS_ERROR_PERIPHERAL;
 
         // Note: Do not call Error_Handler() here as the
         // Entire VCU will crash whenever there is a CAN bus error.
