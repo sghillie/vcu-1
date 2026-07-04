@@ -30,7 +30,7 @@
 #define PM100_ERROR_POST_FAULT        0x04 // power-on self-test fault
 #define PM100_ERROR_RUN_FAULT         0x08 // runtime fault
 
-#define PM100_RX_QUEUE_SIZE           10 // 10 items
+#define PM100_RX_QUEUE_SIZE           32 // items of headroom against bursts of the 6 subscribed frame types
 
 /**
  * @brief   PM100 context
