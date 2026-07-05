@@ -9,6 +9,7 @@
 #define CANBC_H
 
 #include <can.h>
+#include <can_s.h>
 #include <can_t.h>
 #include <rtcan.h>
 #include <stdint.h>
@@ -43,7 +44,8 @@ typedef struct
 {
     TX_THREAD thread;                 // service thread
     TX_MUTEX state_mutex;             // mutex for locking broadcast states
-    rtcan_handle_t* rtcan_h;          // RTCAN instance to broadcast on
+    rtcan_handle_t* rtcan_t_h;        // RTCAN instance for the tractive bus
+    rtcan_handle_t* rtcan_s_h;        // RTCAN instance for the sensor bus
     canbc_states_t states;            // broadcasting states
     uint16_t rolling_counter;         // counts number of broadcasts
     const config_canbc_t* config_ptr; // configuration
@@ -54,7 +56,8 @@ typedef struct
  * public functions
  */
 status_t canbc_init(canbc_context_t* canbc_h,
-                    rtcan_handle_t* rtcan_h,
+                    rtcan_handle_t* rtcan_t_h,
+                    rtcan_handle_t* rtcan_s_h,
                     TX_BYTE_POOL* stack_pool_ptr,
                     const config_canbc_t* config_ptr);
 

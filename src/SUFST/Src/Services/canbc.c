@@ -1,5 +1,6 @@
 #include "canbc.h"
 
+#include <can_s.h>
 #include <can_t.h>
 
 /*
@@ -13,16 +14,19 @@ static void send_bc_messages(canbc_context_t *canbc_h);
  * @brief       Initialise CANBC service
  *
  * @param[in]   canbc_h         CANBC handle
- * @param[in]   rtcan_h         RTCAN handle
+ * @param[in]   rtcan_t_h       RTCAN handle for the tractive bus
+ * @param[in]   rtcan_s_h       RTCAN handle for the sensor bus
  * @param[in]   stack_pool_ptr  Application memory pool
  * @param[in]   config_ptr      Configuration
  */
 status_t canbc_init(canbc_context_t *canbc_h,
-                    rtcan_handle_t *rtcan_h,
+                    rtcan_handle_t *rtcan_t_h,
+                    rtcan_handle_t *rtcan_s_h,
                     TX_BYTE_POOL *stack_pool_ptr,
                     const config_canbc_t *config_ptr)
 {
-    canbc_h->rtcan_h = rtcan_h;
+    canbc_h->rtcan_t_h = rtcan_t_h;
+    canbc_h->rtcan_s_h = rtcan_s_h;
     canbc_h->config_ptr = config_ptr;
     canbc_h->rolling_counter = 0;
 
@@ -107,7 +111,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_STATE_IS_EXTENDED};
 
         can_t_vcu_state_pack(message.data, &snapshot.state, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU state\n");
     }
 
@@ -118,7 +122,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_SENSORS_IS_EXTENDED};
 
         can_t_vcu_sensors_pack(message.data, &snapshot.sensors, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU sensors\n");
     }
 
@@ -129,7 +133,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_TEMPS_IS_EXTENDED};
 
         can_t_vcu_temps_pack(message.data, &snapshot.temps, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU temps\n");
     }
 
@@ -140,7 +144,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_ERROR_IS_EXTENDED};
 
         can_t_vcu_error_pack(message.data, &snapshot.errors, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU errors\n");
     }
 
@@ -151,7 +155,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_PDM_IS_EXTENDED};
 
         can_t_vcu_pdm_pack(message.data, &snapshot.pdm, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU PDM\n");
     }
 
@@ -162,7 +166,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
                                 .extended = CAN_T_VCU_SENSORS_RAW_IS_EXTENDED};
 
         can_t_vcu_sensors_raw_pack(message.data, &snapshot.sensors_raw, message.length);
-        if (rtcan_transmit(canbc_h->rtcan_h, &message) != RTCAN_OK)
+        if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
             LOG_ERROR("canbc: failed to transmit VCU raw sensors\n");
     }
 }
