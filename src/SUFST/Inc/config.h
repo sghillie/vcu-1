@@ -224,6 +224,11 @@ typedef struct {
      config_thread_t thread;
 } config_usb_msc_t;
 
+typedef struct
+{
+    config_scs_t sagl;                      // ADC configuration for the steering angle signal
+} config_ext_inputs_t;
+
 /**
  * @brief   VCU configuration
  * 
@@ -250,6 +255,7 @@ typedef struct {
      config_wheelspeed_t wheelspeed;
      config_sd_t sd;
      config_usb_msc_t usb_msc;
+     config_ext_inputs_t ext_inputs;
 } config_t;
 
 /*

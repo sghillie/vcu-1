@@ -121,6 +121,8 @@ void ctrl_thread_entry(ULONG input)
 
         ctrl_ptr->shdn_reading = trc_ready();
 
+        tick_get_sagl_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->sagl_reading);
+
         ctrl_ptr->motor_temp = pm100_motor_temp(ctrl_ptr->pm100_ptr);
         ctrl_ptr->inv_temp = pm100_max_inverter_temp(ctrl_ptr->pm100_ptr);
         ctrl_ptr->max_temp = ctrl_ptr->motor_temp > ctrl_ptr->inv_temp ?

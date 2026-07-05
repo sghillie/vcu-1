@@ -220,6 +220,17 @@ static const config_t config_instance = {
             .priority = 5,
             .stack_size = 8192
         }
+    },
+    .ext_inputs = {
+        .sagl = {
+            .hadc = &hadc1,
+            .adc_channel = ADC_CHANNEL_6,
+            .min_adc = 0,
+            .max_adc = 3300,
+            .min_mapped = 0,
+            .max_mapped = 4000,
+            .outside_bounds_fraction = 0.05f
+        }
     }
 };
 

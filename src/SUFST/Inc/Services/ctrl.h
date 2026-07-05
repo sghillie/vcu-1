@@ -66,7 +66,7 @@ typedef struct
      TX_THREAD thread;            // service thread
      uint16_t apps_reading;       // APPS reading (% * 10)
      uint16_t bps_reading;        // BPS reading (% * 10)
-     int16_t sagl_reading;        // steering angle reading (deg * 10)
+     uint16_t sagl_reading;       // steering angle reading (% * 40)
      int16_t motor_speed_reading; // motor speed reading (rpm)
      uint16_t torque_request;     // last torque request
      uint8_t shdn_reading;

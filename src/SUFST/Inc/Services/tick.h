@@ -8,6 +8,7 @@
 #include "canbc.h"
 #include "config.h"
 #include "log.h"
+#include "scs.h"
 #include "status.h"
 
 typedef struct
@@ -21,8 +22,10 @@ typedef struct
     bool brakelight_pwr;
     bool pump_pwr, fan_pwr;
     apps_context_t apps;
-    status_t bps_status, apps_status;
-    uint16_t bps_reading, apps_reading;
+    status_t bps_status, apps_status, sagl_status;
+    uint16_t bps_reading, apps_reading, sagl_reading;
+
+    scs_t sagl;
 } tick_context_t;
 
 status_t tick_init(tick_context_t* tick_ptr,
@@ -30,9 +33,11 @@ status_t tick_init(tick_context_t* tick_ptr,
                    TX_BYTE_POOL* stack_pool_ptr,
                    const config_tick_t* config_ptr,
                    const config_apps_t* apps_config_ptr,
-                   const config_bps_t* bps_config_ptr);
+                   const config_bps_t* bps_config_ptr,
+                   const config_scs_t* sagl_scs_config_ptr);
 
 status_t tick_get_bps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result);
+status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result);
 
 #endif /* TICK_H */

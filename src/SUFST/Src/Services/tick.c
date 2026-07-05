@@ -20,6 +20,9 @@ static void tick_thread_entry(ULONG input)
         tick_ptr->apps_status
             = apps_read(&tick_ptr->apps, &tick_ptr->apps_reading);
 
+        tick_ptr->sagl_status
+            = scs_read(&tick_ptr->sagl, &tick_ptr->sagl_reading);
+
 /*LOG_INFO(tick_ptr->log_ptr, "Brake pressure: %d   status: %d\n",
   tick_ptr->bps_reading, tick_ptr->bps_status);*/
 /*LOG_INFO(tick_ptr->log_ptr, "APPS: %d   status: %d\n",
@@ -38,7 +41,8 @@ status_t tick_init(tick_context_t* tick_ptr,
                    TX_BYTE_POOL* stack_pool_ptr,
                    const config_tick_t* config_ptr,
                    const config_apps_t* apps_config_ptr,
-                   const config_bps_t* bps_config_ptr)
+                   const config_bps_t* bps_config_ptr,
+                   const config_scs_t* sagl_scs_config_ptr)
 {
     tick_ptr->config_ptr = config_ptr;
     tick_ptr->canbc_ptr = canbc_ptr;
@@ -46,6 +50,7 @@ status_t tick_init(tick_context_t* tick_ptr,
     // Assume error so that it won't proceed without at least 1 reading
     tick_ptr->bps_status = STATUS_ERROR;
     tick_ptr->apps_status = STATUS_ERROR;
+    tick_ptr->sagl_status = STATUS_ERROR;
 
     status_t status = STATUS_OK;
 
@@ -68,6 +73,11 @@ status_t tick_init(tick_context_t* tick_ptr,
     if (status == STATUS_OK)
     {
         status = bps_init(&tick_ptr->bps, bps_config_ptr);
+    }
+
+    if (status == STATUS_OK)
+    {
+        status = scs_create(&tick_ptr->sagl, sagl_scs_config_ptr);
     }
 
     if (tx_status == TX_SUCCESS)
@@ -163,6 +173,24 @@ status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result)
     else
     {
         LOG_ERROR("APPS locking error\n");
+    }
+
+    return status;
+}
+
+status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result)
+{
+    status_t status = STATUS_ERROR;
+
+    if (lock_tick_sensors(tick_ptr, 100) == STATUS_OK)
+    {
+        *result = tick_ptr->sagl_reading;
+        status = tick_ptr->sagl_status;
+        unlock_tick_sensors(tick_ptr);
+    }
+    else
+    {
+        LOG_ERROR("SAGL locking error\n");
     }
 
     return status;
