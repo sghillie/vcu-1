@@ -67,6 +67,7 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
 
     if (apps_ptr->config_ptr->inverted)
     {
+        reading_1 = apps_ptr->config_ptr->apps_1_scs.max_mapped - reading_1;
         reading_2 = apps_ptr->config_ptr->apps_2_scs.max_mapped - reading_2;
     }
 
