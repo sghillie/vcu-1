@@ -231,6 +231,15 @@ static const config_t config_instance = {
             .max_mapped = 4000,
             .outside_bounds_fraction = 0.05f
         }
+    },
+    .fans = {
+        .thread = {
+            .name = "WHEELSPEED",
+            .priority = 12,
+            .stack_size = 1024,
+        },
+        .broadcast_timeout_ticks = SECONDS_TO_TICKS(10),
+        .enable = true
     }
 };
 

@@ -173,6 +173,7 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                            &vcu_ptr->tick,
                            &vcu_ptr->remote_ctrl,
                            &vcu_ptr->canbc,
+                           &vcu_ptr->fans,
                            app_mem_pool,
                            &vcu_ptr->config_ptr->ctrl,
                            &vcu_ptr->config_ptr->rtds,
@@ -197,6 +198,15 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                                  &vcu_ptr->rtcan_s,
                                  app_mem_pool,
                                  &vcu_ptr->config_ptr->wheelspeed);
+    }
+
+    // fans
+    if (status == STATUS_OK)
+    {
+        status = fans_init(&vcu_ptr->fans,
+                           &vcu_ptr->rtcan_s,
+                           app_mem_pool,
+                           &vcu_ptr->config_ptr->fans);
     }
 
     // sd card

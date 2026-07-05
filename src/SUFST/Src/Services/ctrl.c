@@ -48,7 +48,8 @@ status_t ctrl_init(ctrl_context_t* ctrl_ptr,
                    tick_context_t* tick_ptr,
                    remote_ctrl_context_t* remote_ctrl_ptr,
                    canbc_context_t* canbc_ptr,
-                   TX_BYTE_POOL* stack_pool_ptr,
+                   fans_context_t* fans_ptr,
+                   TX_BYTE_POOL * stack_pool_ptr,
                    const config_ctrl_t* config_ptr,
                    const config_rtds_t* rtds_config_ptr,
                    const config_torque_map_t* torque_map_config_ptr)
@@ -60,6 +61,7 @@ status_t ctrl_init(ctrl_context_t* ctrl_ptr,
     ctrl_ptr->canbc_ptr = canbc_ptr;
     ctrl_ptr->config_ptr = config_ptr;
     ctrl_ptr->rtds_config_ptr = rtds_config_ptr;
+    ctrl_ptr->fans_ptr = fans_ptr;
     ctrl_ptr->error = CTRL_ERROR_NONE;
     ctrl_ptr->apps_reading = 0;
     ctrl_ptr->bps_reading = 0;
@@ -135,15 +137,16 @@ void ctrl_thread_entry(ULONG input)
                  ctrl_ptr->inv_temp,
                  ctrl_ptr->max_temp);
         */
-        if (ctrl_fan_passed_on_threshold(ctrl_ptr)) {
-            ctrl_ptr->fan_pwr = 1;
-        } else if (ctrl_ptr->fan_pwr) {
-            if (ctrl_fan_passed_off_threshold(ctrl_ptr)) {
-                ctrl_ptr->fan_pwr = 0;
-            }
-        } else {
-            ctrl_ptr->fan_pwr = 0;
-        }
+        ctrl_ptr->fan_pwr = ctrl_ptr->fans_ptr->fan_switch_status;
+        // if (ctrl_fan_passed_on_threshold(ctrl_ptr)) {
+        //     ctrl_ptr->fan_pwr = 1;
+        // } else if (ctrl_ptr->fan_pwr) {
+        //     if (ctrl_fan_passed_off_threshold(ctrl_ptr)) {
+        //         ctrl_ptr->fan_pwr = 0;
+        //     }
+        // } else {
+        //     ctrl_ptr->fan_pwr = 0;
+        // }
 
         ctrl_state_machine_tick(ctrl_ptr);
         ctrl_update_canbc_states(ctrl_ptr);

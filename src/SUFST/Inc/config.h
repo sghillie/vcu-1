@@ -229,6 +229,14 @@ typedef struct
     config_scs_t sagl;                      // ADC configuration for the steering angle signal
 } config_ext_inputs_t;
 
+typedef struct
+{
+    // TODO: GPIO input pin
+    config_thread_t thread;
+    uint32_t broadcast_timeout_ticks;       // maximum number of ticks to wait for a broadcast
+    bool enable;
+} config_fans_t;
+
 /**
  * @brief   VCU configuration
  * 
@@ -256,6 +264,7 @@ typedef struct {
      config_sd_t sd;
      config_usb_msc_t usb_msc;
      config_ext_inputs_t ext_inputs;
+     config_fans_t fans;
 } config_t;
 
 /*

@@ -23,6 +23,7 @@
 #include "tick.h"
 #include "torque_map.h"
 #include "remote_ctrl.h"
+#include "fans.h"
 
 /*
  * error codes
@@ -85,6 +86,7 @@ typedef struct
      dash_context_t *dash_ptr;               // dash service
      pm100_context_t *pm100_ptr;             // PM100 service
      canbc_context_t *canbc_ptr;             // CANBC service
+     fans_context_t *fans_ptr;               // Fans service (reads sensor hub fan switch)
      tick_context_t *tick_ptr;               // tick thread (reads certain sensors)
      remote_ctrl_context_t *remote_ctrl_ptr; // tick thread (reads certain sensors)
      torque_map_t torque_map;                // torque map (APPS -> torque request)
@@ -105,6 +107,7 @@ status_t ctrl_init(ctrl_context_t *ctrl_ptr,
                    tick_context_t *tick_ptr,
                    remote_ctrl_context_t *remote_ctrl_ptr,
                    canbc_context_t *canbc_ptr,
+                   fans_context_t* fans_ptr,
                    TX_BYTE_POOL *stack_pool_ptr,
                    const config_ctrl_t *config_ptr,
                    const config_rtds_t *rtds_config_ptr,

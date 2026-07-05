@@ -18,6 +18,7 @@
 #include "canbc.h"
 #include "config.h"
 #include "ctrl.h"
+#include "fans.h"
 #include "dash.h"
 #include "heartbeat.h"
 #include "log.h"
@@ -42,6 +43,7 @@ typedef struct
      dash_context_t dash;           // dash service
      ctrl_context_t ctrl;           // control service
      pm100_context_t pm100;         // PM100 service
+     fans_context_t fans;
      tick_context_t tick;
      remote_ctrl_context_t remote_ctrl;
      heartbeat_context_t heartbeat;    // heartbeat service

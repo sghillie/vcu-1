@@ -115,6 +115,7 @@ src/SUFST/Src/Services/tick.c \
 src/SUFST/Src/Services/log.c \
 src/SUFST/Src/Services/heartbeat.c \
 src/SUFST/Src/Services/wheelspeed.c \
+src/SUFST/Src/Services/fans.c \
 src/SUFST/Src/Services/sd_logging.c \
 src/SUFST/Src/Test/testbench.c \
 src/SUFST/Src/Test/apps_testbench_data.c \
