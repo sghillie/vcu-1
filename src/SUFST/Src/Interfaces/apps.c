@@ -65,6 +65,11 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     status_t status_2 = scs_read(&apps_ptr->apps_2_signal, &reading_2);
     scs_status_t status_2_verbose = apps_ptr->apps_2_signal.status_verbose;
 
+    if (apps_ptr->config_ptr->inverted)
+    {
+        reading_2 = apps_ptr->config_ptr->apps_2_scs.max_mapped - reading_2;
+    }
+
     if (status_1 != STATUS_OK)
     {
         status = STATUS_ERROR;
@@ -98,17 +103,7 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     }
 
     // return reading
-    if (status == STATUS_OK)
-    {
-        uint16_t raw = reading_2; //(reading_1 + reading_2) / 2;
-        *reading_ptr = apps_ptr->config_ptr->inverted
-                       ? (apps_ptr->config_ptr->apps_2_scs.max_mapped - raw)
-                       : raw;
-    }
-    else
-    {
-        *reading_ptr = 0;
-    }
+    *reading_ptr = (status == STATUS_OK) ? reading_2 : 0; //(reading_1 + reading_2) / 2;
 
     return status;
 }
