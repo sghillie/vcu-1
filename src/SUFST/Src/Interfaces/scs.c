@@ -107,7 +107,6 @@ status_t scs_read(scs_t *scs_ptr, uint16_t *reading_ptr)
     {
         scs_ptr->invalid_start_tick = tx_time_get();
         scs_ptr->is_valid = false;
-        scs_ptr->adc_reading = scs_ptr->config_ptr->min_adc;
         scs_ptr->mapped_reading = scs_ptr->config_ptr->min_mapped;
     }
 
