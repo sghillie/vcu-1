@@ -64,7 +64,7 @@ static const config_t config_instance = {
             .max_adc = 1276,
             .min_mapped = 0,
             .max_mapped = 1000,
-            .outside_bounds_fraction = 0.05f
+            .outside_bounds_fraction = 0.5f
         },
         .apps_2_scs = {
             .hadc = &hadc2,
@@ -75,7 +75,7 @@ static const config_t config_instance = {
             .max_adc = 2021,
             .min_mapped = 0,
             .max_mapped = 1000,
-            .outside_bounds_fraction = 0.05f
+            .outside_bounds_fraction = 0.5f
         },
         .max_discrepancy = 70, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
         .inverted = true
@@ -88,9 +88,9 @@ static const config_t config_instance = {
             .max_adc = 1000,
             .min_mapped = 0,
             .max_mapped = 1000,
-            .outside_bounds_fraction = 0.05f
+            .outside_bounds_fraction = 0.5f
         },
-        .fully_pressed_fraction = 0.4f
+        .fully_pressed_fraction = 0.25f
     },
     .ctrl = {
         .thread = {
