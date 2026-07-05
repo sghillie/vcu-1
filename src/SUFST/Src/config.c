@@ -239,7 +239,8 @@ static const config_t config_instance = {
             .stack_size = 1024,
         },
         .broadcast_timeout_ticks = SECONDS_TO_TICKS(10),
-        .enable = true
+        .enable = true,
+        .inverted = true
     }
 };
 

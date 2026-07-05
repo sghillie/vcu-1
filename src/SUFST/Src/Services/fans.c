@@ -62,7 +62,7 @@ static void process_broadcast(fans_context_t* fh, const rtcan_msg_t* msg_ptr)
     struct can_s_dash_sensors_digital_t data;
     can_s_dash_sensors_digital_unpack(&data, msg_ptr->data,
                                       msg_ptr->length);
-    fh->fan_switch_status = data.fan_switch;
+    fh->fan_switch_status = fh->config_ptr->inverted ? !data.fan_switch : data.fan_switch;
 }
 
 static void fans_thread_entry(ULONG input)

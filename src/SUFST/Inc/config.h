@@ -231,10 +231,10 @@ typedef struct
 
 typedef struct
 {
-    // TODO: GPIO input pin
     config_thread_t thread;
     uint32_t broadcast_timeout_ticks;       // maximum number of ticks to wait for a broadcast
     bool enable;
+    bool inverted;
 } config_fans_t;
 
 /**
