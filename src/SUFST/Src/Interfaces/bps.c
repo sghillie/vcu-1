@@ -50,7 +50,7 @@ status_t bps_read(bps_context_t* bps_ptr, uint16_t* reading_ptr)
     }
     else if (status_verbose == STATUS_THRESHOLD_WARNING)
     {
-        LOG_INFO("BPS threshold warning;\n");
+        LOG_DEBUG("BPS threshold warning;\n");
     }
 
     LOG_DEBUG("BPS reading: %d;\n", *reading_ptr);
