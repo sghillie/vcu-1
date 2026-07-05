@@ -149,7 +149,7 @@ void pm100_thread_entry(ULONG input)
 
         if (status != RTCAN_OK)
         {
-            LOG_ERROR("Could not subscribe on %d message. Terminating thread\n");
+            LOG_ERROR("Could not subscribe on %d message. Terminating thread\n", i);
             tx_thread_terminate(&pm100_ptr->thread);
         }
     }
