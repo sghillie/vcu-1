@@ -110,7 +110,7 @@ static const config_t config_instance = {
         .precharge_timeout_ticks = SECONDS_TO_TICKS(3),
         .ready_wait_led_toggle_ticks = SECONDS_TO_TICKS(0.5),
         .error_led_toggle_ticks = SECONDS_TO_TICKS(0.1),
-        .hard_max_torque_nm = 230,
+        .hard_max_torque_nm = 100,
         .endurance_max_torque_nm = 130,
         .torque_ctrl_max_slip_percent = 10
     },
