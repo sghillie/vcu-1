@@ -146,6 +146,7 @@ static const config_t config_instance = {
             .stack_size = 1024
         },
         .period = SECONDS_TO_TICKS(0.01)
+        .bps_light_threshold = 80 // Turn breaklight on at 8%
     },
     .remote_ctrl = {
         .thread = {

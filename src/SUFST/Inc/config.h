@@ -156,6 +156,7 @@ typedef struct
 {
      config_thread_t thread;
      uint16_t period;
+     uint32_t bps_light_threshold; // BPS (% * 10) threshold for the light to turn on
 } config_tick_t;
 
 typedef struct

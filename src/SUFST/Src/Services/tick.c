@@ -1,7 +1,5 @@
 #include "tick.h"
 
-#define BPS_LIGHT_THRESH 80
-
 static status_t lock_tick_sensors(tick_context_t* tick_ptr, uint32_t timeout);
 static void unlock_tick_sensors(tick_context_t* tick_ptr);
 void tick_update_canbc_states(tick_context_t* tick_ptr);
@@ -15,7 +13,7 @@ static void tick_thread_entry(ULONG input)
     {
         lock_tick_sensors(tick_ptr, 100);
         tick_ptr->bps_status = bps_read(&tick_ptr->bps, &tick_ptr->bps_reading);
-        tick_ptr->brakelight_pwr = (tick_ptr->bps_reading > BPS_LIGHT_THRESH);
+        tick_ptr->brakelight_pwr = (tick_ptr->bps_reading > config_ptr->bps_light_threshold);
 
         tick_ptr->apps_status
             = apps_read(&tick_ptr->apps, &tick_ptr->apps_reading);

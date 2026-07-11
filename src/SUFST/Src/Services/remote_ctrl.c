@@ -17,7 +17,7 @@ void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr);
 static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr);
 #endif
 
-#define BPS_LIGHT_THRESH 5
+#define BPS_SIM_LIGHT_THRESH 5
 
 status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
                           canbc_context_t *canbc_ptr,
@@ -119,7 +119,7 @@ static void remote_ctrl_thread_entry(ULONG input)
                     {
                         process_broadcast(remote_ctrl_ptr, msg_ptr);
                         rtcan_msg_consumed(remote_ctrl_ptr->rtcan_s_ptr, msg_ptr);
-                        remote_ctrl_ptr->brakelight_pwr = (remote_ctrl_ptr->requests.sim_bps > BPS_LIGHT_THRESH);
+                        remote_ctrl_ptr->brakelight_pwr = (remote_ctrl_ptr->requests.sim_bps > BPS_SIM_LIGHT_THRESH);
                         unlock_sim_sensors(remote_ctrl_ptr);
                     }
                     else
