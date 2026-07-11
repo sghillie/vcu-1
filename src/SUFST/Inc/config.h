@@ -10,6 +10,7 @@
 #define CONFIG_H
 
 #include <adc.h>
+#include <cstdint>
 #include <gpio.h>
 #include <usart.h>
 #include <tx_api.h>
@@ -66,6 +67,9 @@ typedef struct {
      uint16_t fan_on_threshold;              // temperature at which to turn on the fan
      uint16_t fan_off_threshold;             // temperature at which to turn off the fan
      uint16_t bps_on_threshold;              // BPS reading to consider BPS 'on'
+     uint16_t hard_max_torque_nm;            // Hard maximum torque value (e.g. accel)
+     uint16_t endurance_max_torque_nm;       // Max torque in endurance mode
+     uint16_t torque_ctrl_max_slip_percent;  // Max slip percent between rear and front wheels in accel mode
 } config_ctrl_t;
 
 /**

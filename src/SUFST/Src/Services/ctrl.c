@@ -137,7 +137,7 @@ void ctrl_thread_entry(ULONG input)
                  ctrl_ptr->inv_temp,
                  ctrl_ptr->max_temp);
         */
-        if (ctrl_ptr->fans_ptr->fan_switch_status || ctrl_fan_passed_on_threshold(ctrl_ptr)) {
+        if (ctrl_fan_passed_on_threshold(ctrl_ptr)) {
             ctrl_ptr->fan_pwr = 1;
         } else if (ctrl_ptr->fan_pwr) {
             if (ctrl_fan_passed_off_threshold(ctrl_ptr)) {
@@ -385,6 +385,10 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
 
         LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);
 
+        if (ctrl_ptr->torque_request > (ctrl_ptr->config_ptr->hard_max_torque_nm * 10))
+        {
+            ctrl_ptr->torque_request = (ctrl_ptr->config_ptr->hard_max_torque_nm * 10);
+        }
         pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, ctrl_ptr->torque_request);
 
         if (pm100_status != STATUS_OK) {
@@ -717,8 +721,8 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         states->errors.vcu_ctrl_error = ctrl_ptr->error;
         states->errors.vcu_pm100_error = ctrl_ptr->pm100_ptr->error;
         states->pdm.inverter = ctrl_ptr->inverter_pwr;
-        states->pdm.pump = ctrl_ptr->pump_pwr;
-        states->pdm.fan = ctrl_ptr->fan_pwr;
+        states->pdm.pump = ctrl_ptr->pump_pwr || ctrl_ptr->fans_ptr->fan_switch_status;
+        states->pdm.fan = ctrl_ptr->fan_pwr || ctrl_ptr->fans_ptr->fan_switch_status;
         canbc_unlock_state(ctrl_ptr->canbc_ptr);
     }
 }

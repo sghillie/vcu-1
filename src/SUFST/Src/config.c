@@ -12,7 +12,7 @@
 /**
  * @brief   VCU configuration instance
  * 
- * @details See definitions of parameters in config.h
+* @details See definitions of parameters in config.h
  *
  * @note    This struct is const, i.e. read only! The config should not change
  *          at runtime.
@@ -109,7 +109,10 @@ static const config_t config_instance = {
         .ts_ready_timeout_ticks = SECONDS_TO_TICKS(5),
         .precharge_timeout_ticks = SECONDS_TO_TICKS(3),
         .ready_wait_led_toggle_ticks = SECONDS_TO_TICKS(0.5),
-        .error_led_toggle_ticks = SECONDS_TO_TICKS(0.1)
+        .error_led_toggle_ticks = SECONDS_TO_TICKS(0.1),
+        .hard_max_torque_nm = 230,
+        .endurance_max_torque_nm = 130,
+        .torque_ctrl_max_slip_percent = 10
     },
     .rtds = {
         .active_ticks = SECONDS_TO_TICKS(2),
