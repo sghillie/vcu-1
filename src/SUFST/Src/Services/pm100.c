@@ -321,16 +321,27 @@ int16_t pm100_max_inverter_temp(pm100_context_t* pm100_ptr)
 
     if (tx_status == TX_SUCCESS)
     {
-        if (pm100_ptr->temp1.pm100_module_a > max_temp)
-            max_temp = pm100_ptr->temp1.pm100_module_a;
-        if (pm100_ptr->temp1.pm100_module_b > max_temp)
-            max_temp = pm100_ptr->temp1.pm100_module_b;
-        if (pm100_ptr->temp1.pm100_module_c > max_temp)
-            max_temp = pm100_ptr->temp1.pm100_module_c;
-        if (pm100_ptr->temp1.pm100_gate_driver_board > max_temp)
-            max_temp = pm100_ptr->temp1.pm100_gate_driver_board;
-        if (pm100_ptr->temp2.pm100_control_board_temperature > max_temp)
-            max_temp = pm100_ptr->temp2.pm100_control_board_temperature;
+        int16_t module_a = (int16_t) can_t_pm100_temperature_set_1_pm100_module_a_decode(
+            pm100_ptr->temp1.pm100_module_a);
+        int16_t module_b = (int16_t) can_t_pm100_temperature_set_1_pm100_module_b_decode(
+            pm100_ptr->temp1.pm100_module_b);
+        int16_t module_c = (int16_t) can_t_pm100_temperature_set_1_pm100_module_c_decode(
+            pm100_ptr->temp1.pm100_module_c);
+        int16_t gate_driver_board = (int16_t) can_t_pm100_temperature_set_1_pm100_gate_driver_board_decode(
+            pm100_ptr->temp1.pm100_gate_driver_board);
+        int16_t control_board = (int16_t) can_t_pm100_temperature_set_2_pm100_control_board_temperature_decode(
+            pm100_ptr->temp2.pm100_control_board_temperature);
+
+        if (module_a > max_temp)
+            max_temp = module_a;
+        if (module_b > max_temp)
+            max_temp = module_b;
+        if (module_c > max_temp)
+            max_temp = module_c;
+        if (gate_driver_board > max_temp)
+            max_temp = gate_driver_board;
+        if (control_board > max_temp)
+            max_temp = control_board;
 
         tx_mutex_put(&pm100_ptr->state_mutex);
     }
@@ -350,7 +361,8 @@ int16_t pm100_motor_temp(pm100_context_t* pm100_ptr)
 
     if (tx_status == TX_SUCCESS)
     {
-        motor_temp = pm100_ptr->temp3.pm100_motor_temperature;
+        motor_temp = (int16_t) can_t_pm100_temperature_set_3_pm100_motor_temperature_decode(
+            pm100_ptr->temp3.pm100_motor_temperature);
 
         tx_mutex_put(&pm100_ptr->state_mutex);
     }

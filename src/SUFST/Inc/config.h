@@ -10,7 +10,6 @@
 #define CONFIG_H
 
 #include <adc.h>
-#include <cstdint>
 #include <gpio.h>
 #include <usart.h>
 #include <tx_api.h>
