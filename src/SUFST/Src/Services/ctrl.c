@@ -137,16 +137,15 @@ void ctrl_thread_entry(ULONG input)
                  ctrl_ptr->inv_temp,
                  ctrl_ptr->max_temp);
         */
-        ctrl_ptr->fan_pwr = ctrl_ptr->fans_ptr->fan_switch_status;
-        // if (ctrl_fan_passed_on_threshold(ctrl_ptr)) {
-        //     ctrl_ptr->fan_pwr = 1;
-        // } else if (ctrl_ptr->fan_pwr) {
-        //     if (ctrl_fan_passed_off_threshold(ctrl_ptr)) {
-        //         ctrl_ptr->fan_pwr = 0;
-        //     }
-        // } else {
-        //     ctrl_ptr->fan_pwr = 0;
-        // }
+        if (ctrl_ptr->fans_ptr->fan_switch_status || ctrl_fan_passed_on_threshold(ctrl_ptr)) {
+            ctrl_ptr->fan_pwr = 1;
+        } else if (ctrl_ptr->fan_pwr) {
+            if (ctrl_fan_passed_off_threshold(ctrl_ptr)) {
+                ctrl_ptr->fan_pwr = 0;
+            }
+        } else {
+            ctrl_ptr->fan_pwr = 0;
+        }
 
         ctrl_state_machine_tick(ctrl_ptr);
         ctrl_update_canbc_states(ctrl_ptr);
