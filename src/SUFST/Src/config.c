@@ -106,20 +106,23 @@ static const config_t config_instance = {
         .precharge_timeout_ticks = SECONDS_TO_TICKS(3),
         .ready_wait_led_toggle_ticks = SECONDS_TO_TICKS(0.5),
         .error_led_toggle_ticks = SECONDS_TO_TICKS(0.1),
-        .hard_max_torque_nm = 100,
-        .endurance_max_torque_nm = 130,
+        .hard_max_torque = 1000, // TODO: 2300nm for comp?
+        .endurance_max_torque = 1000, // TODO: 130nm for comp?
+        .crawl_max_torque = 200,
         .torque_ctrl_max_slip_percent = 10
     },
     .rtds = {
         .active_ticks = SECONDS_TO_TICKS(2),
+        .pulse_on_ticks = SECONDS_TO_TICKS(0.1),
+        .pulse_off_ticks = SECONDS_TO_TICKS(0.9),
         .port = R2D_SIREN_GPIO_Port,
         .pin = R2D_SIREN_Pin
     },
     .torque_map = {
         .function = TORQUE_MAP_LINEAR,
         .input_max = 1000, // percent * 10 so 100%
-        .output_max = 700,
-        .deadzone_fraction = 0.15f,
+        .output_max = 1000, // Warning: This is modified by .ctrl.{hard,endurance,crawl}_max_torque depending on the current mode
+        .deadzone_fraction = 0.10f,
         .speed_min = 700,
         .speed_start = 10000,
         .speed_end = 20000
@@ -230,6 +233,15 @@ static const config_t config_instance = {
             .max_adc = 3300,
             .min_mapped = 0,
             .max_mapped = 4000,
+            .outside_bounds_fraction = 0.05f
+        },
+        .mode_switch = {
+            .hadc = &hadc1,
+            .adc_channel = ADC_CHANNEL_4,
+            .min_adc = 0,
+            .max_adc = 3300,
+            .min_mapped = 0,
+            .max_mapped = 330,
             .outside_bounds_fraction = 0.05f
         }
     },

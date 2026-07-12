@@ -464,7 +464,7 @@ status_t pm100_request_torque(pm100_context_t* pm100_ptr, uint16_t torque)
 
                 struct can_t_pm100_command_message_t cmd
                     = {.pm100_torque_command = torque,
-                       .pm100_direction_command = PM100_DIRECTION_FORWARD,
+                       .pm100_direction_command = pm100_ptr->reverse_mode_dangerous ? PM100_DIRECTION_REVERSE : PM100_DIRECTION_FORWARD,
                        .pm100_speed_mode_enable = PM100_SPEED_MODE_DISABLE,
                        .pm100_inverter_enable = inverter_enable};
 

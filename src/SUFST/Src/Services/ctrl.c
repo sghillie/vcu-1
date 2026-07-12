@@ -9,6 +9,7 @@
 
 #include <stdbool.h>
 
+#include "mode_switch_values.h"
 #include "rtds.h"
 #include "trc.h"
 
@@ -108,6 +109,9 @@ status_t ctrl_init(ctrl_context_t* ctrl_ptr,
     // send initial state update
     ctrl_update_canbc_states(ctrl_ptr);
 
+    // Set RTDS tick counters to zero
+    rtds_pulse_init(&ctrl_ptr->rtds_pulse_ctx, rtds_config_ptr);
+
     return status;
 }
 
@@ -126,6 +130,11 @@ void ctrl_thread_entry(ULONG input)
         ctrl_ptr->shdn_reading = trc_ready();
 
         tick_get_sagl_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->sagl_reading);
+
+        uint16_t mode_adc_reading;
+        if (tick_get_mode_adc_reading(ctrl_ptr->tick_ptr, &mode_adc_reading) == STATUS_OK) {
+            ctrl_ptr->requested_mode = convert_mode_adc_to_discrete(mode_adc_reading);
+        }
 
         ctrl_ptr->motor_temp = pm100_motor_temp(ctrl_ptr->pm100_ptr);
         ctrl_ptr->inv_temp = pm100_max_inverter_temp(ctrl_ptr->pm100_ptr);
@@ -150,6 +159,11 @@ void ctrl_thread_entry(ULONG input)
         }
 
         ctrl_state_machine_tick(ctrl_ptr);
+
+        bool rtds_pulse_enable = (ctrl_ptr->state == CTRL_STATE_TS_ON) &&
+                                 (ctrl_ptr->current_mode == CTRL_MODE_REVERSE);
+        rtds_pulse_tick(&ctrl_ptr->rtds_pulse_ctx, rtds_pulse_enable);
+
         ctrl_update_canbc_states(ctrl_ptr);
 
         tx_thread_sleep(ctrl_ptr->config_ptr->schedule_ticks);
@@ -191,6 +205,7 @@ bool ctrl_fan_passed_off_threshold(ctrl_context_t* ctrl_ptr)
  */
 static ctrl_state_t ctrl_proc_ts_button_wait(ctrl_context_t* ctrl_ptr)
 {
+    ctrl_ptr->current_mode = ctrl_ptr->requested_mode;
     if (ctrl_ptr->dash_ptr->tson_flag) {
         dash_clear_buttons(ctrl_ptr->dash_ptr);
 
@@ -202,7 +217,13 @@ static ctrl_state_t ctrl_proc_ts_button_wait(ctrl_context_t* ctrl_ptr)
             ctrl_ptr->neg_air_start = tx_time_get();
             return CTRL_STATE_WAIT_NEG_AIR;
         }
-    } else {
+    }
+    else if (ctrl_ptr->current_mode == CTRL_MODE_INVERTER_PROG)
+    {
+        ctrl_ptr->inverter_pwr = true;
+    }
+    else
+    {
         // Turn off inverter if TS button is not pressed
         ctrl_ptr->inverter_pwr = false;
     }
@@ -260,10 +281,17 @@ static ctrl_state_t ctrl_proc_precharge_wait(ctrl_context_t* ctrl_ptr)
  * @return ctrl_state_t next state
  */
 static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
-{
+{        
     if (!trc_ready()) {
         LOG_ERROR("SHDN opened\n");
         return CTRL_STATE_TS_ACTIVATION_FAILURE;
+    }
+
+    ctrl_ptr->current_mode = ctrl_ptr->requested_mode;   
+    // Stay in R2D on an unknown mode
+    if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_4 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_5 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_6 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_7 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_8)
+    {
+        return ctrl_ptr->state;
     }
 
     if (ctrl_ptr->dash_ptr->tson_flag) // TSON pressed, disable TS
@@ -303,6 +331,26 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
                 ctrl_ptr->pump_pwr = 1;
                 ctrl_ptr->apps_bps_start = tx_time_get();
 
+                uint16_t torque_cap = (ctrl_ptr->current_mode == CTRL_MODE_CRAWL || ctrl_ptr->current_mode == CTRL_MODE_REVERSE) 
+                    ? ctrl_ptr->config_ptr->crawl_max_torque 
+                    : (ctrl_ptr->current_mode == CTRL_MODE_ENDURANCE)
+                    ? ctrl_ptr->config_ptr->endurance_max_torque
+                    : ctrl_ptr->config_ptr->hard_max_torque;
+
+                if (torque_cap > ctrl_ptr->config_ptr->hard_max_torque) {
+                    torque_cap = ctrl_ptr->config_ptr->hard_max_torque;
+                }
+
+                if (ctrl_ptr->current_mode == CTRL_MODE_REVERSE) {
+                    ctrl_ptr->pm100_ptr->reverse_mode_dangerous = true;
+                    LOG_WARN("Reverse active");
+                } else {
+                    ctrl_ptr->pm100_ptr->reverse_mode_dangerous = false;
+                }
+
+                ctrl_ptr->torque_map.output_max = torque_cap;
+                LOG_INFO("Torque cap (nm x10)%d\n", ctrl_ptr->torque_map.output_max);
+
                 LOG_INFO("R2D active\n");
 #ifdef VCU_SIMULATION_MODE
                 return CTRL_STATE_SIM_WAIT_R2D_ON;
@@ -316,6 +364,7 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
         LOG_ERROR("BPS reading failed\n");
         return CTRL_STATE_TS_ACTIVATION_FAILURE;
     }
+
     return ctrl_ptr->state;
 }
 
@@ -386,10 +435,10 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
 #endif
 
         LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);
-
-        if (ctrl_ptr->torque_request > (ctrl_ptr->config_ptr->hard_max_torque_nm * 10))
+        
+        if (ctrl_ptr->torque_request > (ctrl_ptr->config_ptr->hard_max_torque))
         {
-            ctrl_ptr->torque_request = (ctrl_ptr->config_ptr->hard_max_torque_nm * 10);
+            ctrl_ptr->torque_request = (ctrl_ptr->config_ptr->hard_max_torque);
         }
         pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, ctrl_ptr->torque_request);
 
@@ -718,6 +767,8 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         states->sensors.vcu_torque_request = ctrl_ptr->torque_request;
         states->temps.vcu_max_temp = ctrl_ptr->max_temp;
         states->state.vcu_ctrl_state = (uint8_t)ctrl_ptr->state;
+        states->state.vcu_requested_mode = (uint8_t)ctrl_ptr->requested_mode;
+        states->state.vcu_current_mode = (uint8_t)ctrl_ptr->current_mode;
         states->state.vcu_drs_active = ctrl_ptr->shdn_reading;
         states->errors.vcu_ctrl_error = ctrl_ptr->error;
         states->errors.vcu_pm100_error = ctrl_ptr->pm100_ptr->error;

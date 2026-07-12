@@ -66,8 +66,9 @@ typedef struct {
      uint16_t fan_on_threshold;              // temperature at which to turn on the fan
      uint16_t fan_off_threshold;             // temperature at which to turn off the fan
      uint16_t bps_on_threshold;              // BPS reading to consider BPS 'on'
-     uint16_t hard_max_torque_nm;            // Hard maximum torque value (e.g. accel)
-     uint16_t endurance_max_torque_nm;       // Max torque in endurance mode
+     uint16_t hard_max_torque;               // Hard maximum torque value (e.g. accel)
+     uint16_t endurance_max_torque;          // Max torque in endurance mode
+     uint16_t crawl_max_torque;           // Max torque in crawl/reverse mode
      uint16_t torque_ctrl_max_slip_percent;  // Max slip percent between rear and front wheels in accel mode
 } config_ctrl_t;
 
@@ -106,7 +107,9 @@ typedef struct {
  * @brief   Ready to drive speaker
  */
 typedef struct {
-     uint32_t active_ticks;                  // ticks for which RTDS sounds
+     uint32_t active_ticks;                  // ticks for which RTDS sounds (one-shot R2D activation)
+     uint32_t pulse_on_ticks;                // ticks RTDS is on during each reverse-mode pulse
+     uint32_t pulse_off_ticks;               // ticks RTDS is off between reverse-mode pulses
      GPIO_TypeDef* port;                     // port for pin driving RTDS
      uint16_t pin;                           // pin driving RTDS
 } config_rtds_t;
@@ -232,6 +235,7 @@ typedef struct
 {
     uint32_t sample_divider;                // sample every Nth tick (1 = every tick), applies to all ext_inputs
     config_scs_t sagl;                      // ADC configuration for the steering angle signal
+    config_scs_t mode_switch;               // ADC configuration for the dash mode selector switch
 } config_ext_inputs_t;
 
 typedef struct

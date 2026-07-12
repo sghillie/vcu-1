@@ -22,6 +22,8 @@ static void tick_thread_entry(ULONG input)
         {
             tick_ptr->sagl_status
                 = scs_read(&tick_ptr->sagl, &tick_ptr->sagl_reading);
+            tick_ptr->mode_adc_status =
+                scs_read(&tick_ptr->mode_adc, &tick_ptr->mode_adc_reading);
         }
         tick_ptr->ext_inputs_counter
             = (tick_ptr->ext_inputs_counter + 1)
@@ -56,6 +58,7 @@ status_t tick_init(tick_context_t* tick_ptr,
     tick_ptr->bps_status = STATUS_ERROR;
     tick_ptr->apps_status = STATUS_ERROR;
     tick_ptr->sagl_status = STATUS_ERROR;
+    tick_ptr->mode_adc_status = STATUS_ERROR;
     tick_ptr->ext_inputs_counter = 0;
 
     status_t status = STATUS_OK;
@@ -84,6 +87,11 @@ status_t tick_init(tick_context_t* tick_ptr,
     if (status == STATUS_OK)
     {
         status = scs_create(&tick_ptr->sagl, &ext_inputs_config_ptr->sagl);
+    }
+
+    if (status == STATUS_OK)
+    {
+        status = scs_create(&tick_ptr->mode_adc, &ext_inputs_config_ptr->mode_switch);
     }
 
     if (tx_status == TX_SUCCESS)
@@ -197,6 +205,24 @@ status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result)
     else
     {
         LOG_ERROR("SAGL locking error\n");
+    }
+
+    return status;
+}
+
+status_t tick_get_mode_adc_reading(tick_context_t* tick_ptr, uint16_t* result)
+{
+    status_t status = STATUS_ERROR;
+
+    if (lock_tick_sensors(tick_ptr, 100) == STATUS_OK)
+    {
+        *result = tick_ptr->mode_adc_reading;
+        status = tick_ptr->mode_adc_status;
+        unlock_tick_sensors(tick_ptr);
+    }
+    else
+    {
+        LOG_ERROR("Mode switch locking error\n");
     }
 
     return status;

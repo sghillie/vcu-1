@@ -19,6 +19,7 @@
 #include "dash.h"
 #include "log.h"
 #include "pm100.h"
+#include "rtds.h"
 #include "status.h"
 #include "tick.h"
 #include "torque_map.h"
@@ -59,11 +60,18 @@ typedef enum
 } ctrl_state_t;
 
 typedef enum { 
+     CTRL_MODE_UNKNOWN = 0,
      CTRL_MODE_ENDURANCE = 1,
      CTRL_MODE_MAX = 2,
      CTRL_MODE_TORQUE_CTRL = 3,
+     CTRL_MODE_UNKNOWN_4 = 4,
+     CTRL_MODE_UNKNOWN_5 = 5,
+     CTRL_MODE_UNKNOWN_6 = 6,
+     CTRL_MODE_UNKNOWN_7 = 7,
+     CTRL_MODE_UNKNOWN_8 = 8,
      CTRL_MODE_CRAWL = 9,
      CTRL_MODE_REVERSE = 10,
+     CTRL_MODE_UNKNOWN_11 = 11,
      CTRL_MODE_INVERTER_PROG = 12
  } ctrl_mode_t;
 
@@ -104,6 +112,7 @@ typedef struct
 
      const config_ctrl_t *config_ptr;      // config
      const config_rtds_t *rtds_config_ptr; // RTDS config
+     rtds_pulse_context_t rtds_pulse_ctx;  // non-blocking RTDS reverse-pulse state
 
     uint8_t error; // error code
 

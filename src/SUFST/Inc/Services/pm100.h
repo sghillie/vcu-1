@@ -52,6 +52,7 @@ typedef struct
      struct can_t_pm100_motor_position_info_t info;
      uint16_t error;
      const config_pm100_t* config_ptr;
+     bool reverse_mode_dangerous;
 } pm100_context_t;
 
 /*
