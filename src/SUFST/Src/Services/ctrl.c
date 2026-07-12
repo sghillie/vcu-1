@@ -344,17 +344,17 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
 
     if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
         // Check for brake + accel pedal pressed
-        if (ctrl_ptr->apps_reading >= ctrl_ptr->config_ptr->apps_bps_high_threshold &&
-            ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) {
-            LOG_ERROR("BP and AP pressed\n");
+        // if (ctrl_ptr->apps_reading >= ctrl_ptr->config_ptr->apps_bps_high_threshold &&
+        //     ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) {
+            // LOG_ERROR("BP and AP pressed\n");
 
-            if (tx_time_get() >= ctrl_ptr->apps_bps_start + (TX_TIMER_TICKS_PER_SECOND / 3)) {
-                LOG_ERROR("BP-AP fault\n");
-                return CTRL_STATE_APPS_BPS_FAULT;
-            }
-        } else {
+            // if (tx_time_get() >= ctrl_ptr->apps_bps_start + (TX_TIMER_TICKS_PER_SECOND / 3)) {
+            //     LOG_ERROR("BP-AP fault\n");
+            //     return CTRL_STATE_APPS_BPS_FAULT;
+            // }
+        // } else {
             ctrl_ptr->apps_bps_start = tx_time_get();
-        }
+        // }
 
         int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
 
@@ -496,10 +496,8 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
             (ctrl_ptr->bps_reading < ctrl_ptr->config_ptr->bps_on_threshold)) {
             return CTRL_STATE_TS_ON;
         }
-    } else {
-        return CTRL_STATE_APPS_SCS_FAULT;
     }
-    return ctrl_ptr->state;
+    return CTRL_STATE_APPS_SCS_FAULT;
 }
 
 /**
@@ -692,8 +690,9 @@ void ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr)
     dash_context_t* dash_ptr = ctrl_ptr->dash_ptr;
     const config_ctrl_t* config_ptr = ctrl_ptr->config_ptr;
 
-    // pm100_lvs_off(ctrl_ptr->pm100_ptr);
-    ctrl_ptr->inverter_pwr = false;
+    pm100_lvs_off(ctrl_ptr->pm100_ptr);
+    // ctrl_ptr->inverter_pwr = false;
+    pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
     ctrl_ptr->pump_pwr = false;
     ctrl_ptr->fan_pwr = false;
 
