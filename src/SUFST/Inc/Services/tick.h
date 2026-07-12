@@ -16,6 +16,7 @@ typedef struct
     TX_THREAD thread;
     TX_MUTEX sensor_mutex;
     const config_tick_t* config_ptr;
+    const config_ext_inputs_t* ext_inputs_config_ptr;
     canbc_context_t* canbc_ptr;
 
     bps_context_t bps;
@@ -24,6 +25,7 @@ typedef struct
     apps_context_t apps;
     status_t bps_status, apps_status, sagl_status;
     uint16_t bps_reading, apps_reading, sagl_reading;
+    uint32_t ext_inputs_counter;
 
     scs_t sagl;
 } tick_context_t;
@@ -34,7 +36,7 @@ status_t tick_init(tick_context_t* tick_ptr,
                    const config_tick_t* config_ptr,
                    const config_apps_t* apps_config_ptr,
                    const config_bps_t* bps_config_ptr,
-                   const config_scs_t* sagl_scs_config_ptr);
+                   const config_ext_inputs_t* ext_inputs_config_ptr);
 
 status_t tick_get_bps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result);

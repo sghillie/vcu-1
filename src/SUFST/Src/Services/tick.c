@@ -18,8 +18,14 @@ static void tick_thread_entry(ULONG input)
         tick_ptr->apps_status
             = apps_read(&tick_ptr->apps, &tick_ptr->apps_reading);
 
-        tick_ptr->sagl_status
-            = scs_read(&tick_ptr->sagl, &tick_ptr->sagl_reading);
+        if (tick_ptr->ext_inputs_counter == 0)
+        {
+            tick_ptr->sagl_status
+                = scs_read(&tick_ptr->sagl, &tick_ptr->sagl_reading);
+        }
+        tick_ptr->ext_inputs_counter
+            = (tick_ptr->ext_inputs_counter + 1)
+              % tick_ptr->ext_inputs_config_ptr->sample_divider;
 
 /*LOG_INFO(tick_ptr->log_ptr, "Brake pressure: %d   status: %d\n",
   tick_ptr->bps_reading, tick_ptr->bps_status);*/
@@ -40,15 +46,17 @@ status_t tick_init(tick_context_t* tick_ptr,
                    const config_tick_t* config_ptr,
                    const config_apps_t* apps_config_ptr,
                    const config_bps_t* bps_config_ptr,
-                   const config_scs_t* sagl_scs_config_ptr)
+                   const config_ext_inputs_t* ext_inputs_config_ptr)
 {
     tick_ptr->config_ptr = config_ptr;
+    tick_ptr->ext_inputs_config_ptr = ext_inputs_config_ptr;
     tick_ptr->canbc_ptr = canbc_ptr;
 
     // Assume error so that it won't proceed without at least 1 reading
     tick_ptr->bps_status = STATUS_ERROR;
     tick_ptr->apps_status = STATUS_ERROR;
     tick_ptr->sagl_status = STATUS_ERROR;
+    tick_ptr->ext_inputs_counter = 0;
 
     status_t status = STATUS_OK;
 
@@ -75,7 +83,7 @@ status_t tick_init(tick_context_t* tick_ptr,
 
     if (status == STATUS_OK)
     {
-        status = scs_create(&tick_ptr->sagl, sagl_scs_config_ptr);
+        status = scs_create(&tick_ptr->sagl, &ext_inputs_config_ptr->sagl);
     }
 
     if (tx_status == TX_SUCCESS)

@@ -222,6 +222,7 @@ static const config_t config_instance = {
         }
     },
     .ext_inputs = {
+        .sample_divider = 10, // sample non-critical ext_inputs at 1/10th the tick rate
         .sagl = {
             .hadc = &hadc1,
             .adc_channel = ADC_CHANNEL_6,
