@@ -113,7 +113,10 @@ uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input)
 
     const uint16_t torque = (uint16_t) (input * scale_factor);
 
-    // TODO: clip to range
+    if (input > map_ptr->config_ptr->input_max) 
+    {
+        input = map_ptr->config_ptr->input_max;
+    }
 
     return torque;
 }
