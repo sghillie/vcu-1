@@ -58,12 +58,23 @@ typedef enum
      CTRL_STATE_SIM_WAIT_R2D_ON,
 } ctrl_state_t;
 
+typedef enum { 
+     CTRL_MODE_ENDURANCE = 1,
+     CTRL_MODE_MAX = 2,
+     CTRL_MODE_TORQUE_CTRL = 3,
+     CTRL_MODE_CRAWL = 9,
+     CTRL_MODE_REVERSE = 10,
+     CTRL_MODE_INVERTER_PROG = 12
+ } ctrl_mode_t;
+
 /**
  * @brief   Control service context
  */
 typedef struct
 {
      ctrl_state_t state;          // state machine state
+     ctrl_mode_t current_mode;            // current ctrl mode
+     ctrl_mode_t requested_mode;  // requested ctrl mode
      TX_THREAD thread;            // service thread
      uint16_t apps_reading;       // APPS reading (% * 10)
      uint16_t bps_reading;        // BPS reading (% * 10)

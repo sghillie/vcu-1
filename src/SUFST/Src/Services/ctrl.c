@@ -55,6 +55,8 @@ status_t ctrl_init(ctrl_context_t* ctrl_ptr,
                    const config_torque_map_t* torque_map_config_ptr)
 {
     ctrl_ptr->state = CTRL_STATE_TS_BUTTON_WAIT;
+    ctrl_ptr->current_mode = CTRL_MODE_ENDURANCE;
+    ctrl_ptr->requested_mode = CTRL_MODE_ENDURANCE;
     ctrl_ptr->dash_ptr = dash_ptr;
     ctrl_ptr->pm100_ptr = pm100_ptr;
     ctrl_ptr->tick_ptr = tick_ptr;
