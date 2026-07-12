@@ -288,8 +288,8 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
     }
 
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;   
-    // Stay in R2D on an unknown mode
-    if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_4 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_5 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_6 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_7 || ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN_8)
+    // Stay in R2D_Wait on an unknown mode (e.g. blank spot or inverter programming)s
+    if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode > CTRL_MODE_REVERSE)
     {
         return ctrl_ptr->state;
     }
@@ -767,8 +767,8 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         states->sensors.vcu_torque_request = ctrl_ptr->torque_request;
         states->temps.vcu_max_temp = ctrl_ptr->max_temp;
         states->state.vcu_ctrl_state = (uint8_t)ctrl_ptr->state;
-        states->state.vcu_requested_mode = (uint8_t)ctrl_ptr->requested_mode;
-        states->state.vcu_current_mode = (uint8_t)ctrl_ptr->current_mode;
+        states->state.vcu_requested_mode = can_t_vcu_state_vcu_requested_mode_encode(ctrl_ptr->requested_mode);
+        states->state.vcu_current_mode = can_t_vcu_state_vcu_current_mode_encode(ctrl_ptr->current_mode);
         states->state.vcu_drs_active = ctrl_ptr->shdn_reading;
         states->errors.vcu_ctrl_error = ctrl_ptr->error;
         states->errors.vcu_pm100_error = ctrl_ptr->pm100_ptr->error;

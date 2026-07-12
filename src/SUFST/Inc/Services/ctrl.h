@@ -59,21 +59,22 @@ typedef enum
      CTRL_STATE_SIM_WAIT_R2D_ON,
 } ctrl_state_t;
 
+// Note if changing these, check the line in ctrl.c starting with
+// `if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN)`
+// to allow R2D in any new modes
 typedef enum { 
      CTRL_MODE_UNKNOWN = 0,
      CTRL_MODE_ENDURANCE = 1,
      CTRL_MODE_MAX = 2,
      CTRL_MODE_TORQUE_CTRL = 3,
-     CTRL_MODE_UNKNOWN_4 = 4,
-     CTRL_MODE_UNKNOWN_5 = 5,
+     CTRL_MODE_CRAWL = 4,
+     CTRL_MODE_REVERSE = 5,
      CTRL_MODE_UNKNOWN_6 = 6,
      CTRL_MODE_UNKNOWN_7 = 7,
      CTRL_MODE_UNKNOWN_8 = 8,
-     CTRL_MODE_CRAWL = 9,
-     CTRL_MODE_REVERSE = 10,
-     CTRL_MODE_UNKNOWN_11 = 11,
-     CTRL_MODE_INVERTER_PROG = 12
- } ctrl_mode_t;
+     CTRL_MODE_UNKNOWN_9 = 9,
+     CTRL_MODE_INVERTER_PROG = 10
+} ctrl_mode_t;
 
 /**
  * @brief   Control service context
