@@ -20,6 +20,8 @@ typedef struct
 
     bps_context_t bps;
     bool brakelight_pwr;
+    bool bps_light_prev_above;
+    uint32_t bps_light_active_start;
     bool pump_pwr, fan_pwr;
     apps_context_t apps;
     status_t bps_status, apps_status, sagl_status;
