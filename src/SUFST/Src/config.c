@@ -95,7 +95,7 @@ static const config_t config_instance = {
             .stack_size = 1024
         },
         .schedule_ticks = SECONDS_TO_TICKS(0.01), // 100Hz control loop
-        .r2d_requires_brake = true,
+        .r2d_requires_brake = false,
         .bps_on_threshold = 100,
 	    .apps_bps_low_threshold = 5,
 	    .apps_bps_high_threshold = 30,
