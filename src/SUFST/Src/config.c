@@ -183,7 +183,7 @@ static const config_t config_instance = {
             .stack_size = 1024,
         },
         .min_level = LOG_LEVEL_INFO,
-        .min_sd_log_level = LOG_LEVEL_INFO,
+        .min_sd_log_level = LOG_LEVEL_WARN,
         .uart = &huart8,
         .usart = &husart1,
     },
@@ -211,7 +211,7 @@ static const config_t config_instance = {
     .wheelspeed = {
         .thread = {
             .name = "WHEELSPEED",
-            .priority = 16,
+            .priority = 15,
             .stack_size = 1024,
         },
         .ticks_per_wheel = 48,
@@ -248,7 +248,7 @@ static const config_t config_instance = {
     },
     .fans = {
         .thread = {
-            .name = "WHEELSPEED",
+            .name = "FANS",
             .priority = 12,
             .stack_size = 1024,
         },
