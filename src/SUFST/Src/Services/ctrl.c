@@ -693,7 +693,6 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
     case CTRL_STATE_TS_RUN_FAULT: {
         LOG_ERROR("TS fault during activation or runtime\n");
         ctrl_handle_ts_fault(ctrl_ptr);
-        next_state = CTRL_STATE_TS_BUTTON_WAIT;
         break;
     }
     case CTRL_STATE_SPIN: {
@@ -767,8 +766,8 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         states->sensors.vcu_torque_request = ctrl_ptr->torque_request;
         states->temps.vcu_max_temp = ctrl_ptr->max_temp;
         states->state.vcu_ctrl_state = (uint8_t)ctrl_ptr->state;
-        states->state.vcu_requested_mode = can_t_vcu_state_vcu_requested_mode_encode(ctrl_ptr->requested_mode);
-        states->state.vcu_current_mode = can_t_vcu_state_vcu_current_mode_encode(ctrl_ptr->current_mode);
+        states->state.vcu_requested_mode = (uint8_t)ctrl_ptr->requested_mode;
+        states->state.vcu_current_mode = (uint8_t)ctrl_ptr->current_mode;
         states->state.vcu_drs_active = ctrl_ptr->shdn_reading;
         states->errors.vcu_ctrl_error = ctrl_ptr->error;
         states->errors.vcu_pm100_error = ctrl_ptr->pm100_ptr->error;
