@@ -151,6 +151,7 @@ void tick_update_canbc_states(tick_context_t* tick_ptr)
     if (states != NULL)
     {
         states->pdm.brakelight = tick_ptr->brakelight_pwr;
+        states->errors.vcu_scs_error = (uint8_t) tick_ptr->apps.scs_error;
         states->sensors.vcu_apps = tick_ptr->apps_reading;
         states->sensors.vcu_bps = tick_ptr->bps_reading;
         states->sensors_raw.vcu_apps1_raw = tick_ptr->apps.apps_1_signal.adc_reading;

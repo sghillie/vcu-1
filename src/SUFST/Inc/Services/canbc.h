@@ -50,6 +50,10 @@ typedef struct
     uint16_t rolling_counter;         // counts number of broadcasts
     const config_canbc_t* config_ptr; // configuration
 
+    uint8_t rtcan1_error; // sticky flag: CAN1 (CAN-S) transmit failure
+    uint8_t rtcan2_error; // sticky flag: CAN2 (CAN-T) transmit failure
+    uint8_t canbc_error;  // sticky flag: canbc service failure (e.g. lock timeout)
+
 } canbc_context_t;
 
 /*
