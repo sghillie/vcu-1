@@ -17,8 +17,6 @@ void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr);
 static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr);
 #endif
 
-#define BPS_SIM_LIGHT_THRESH 5
-
 status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
                           canbc_context_t *canbc_ptr,
                           TX_BYTE_POOL *stack_pool_ptr,
@@ -119,7 +117,6 @@ static void remote_ctrl_thread_entry(ULONG input)
                     {
                         process_broadcast(remote_ctrl_ptr, msg_ptr);
                         rtcan_msg_consumed(remote_ctrl_ptr->rtcan_s_ptr, msg_ptr);
-                        remote_ctrl_ptr->brakelight_pwr = (remote_ctrl_ptr->requests.sim_bps > BPS_SIM_LIGHT_THRESH);
                         unlock_sim_sensors(remote_ctrl_ptr);
                     }
                     else
@@ -137,7 +134,6 @@ static void remote_ctrl_thread_entry(ULONG input)
                     LOG_ERROR("Broadcast Error: %d\n", status);
                     reset_remote_ctrl_requests(remote_ctrl_ptr);
                 }
-                remote_ctrl_update_canbc_states(remote_ctrl_ptr);
                 tx_thread_sleep(config_ptr->period);
             }
     #endif
@@ -181,49 +177,15 @@ uint16_t remote_get_torque_reading(remote_ctrl_context_t *remote_ctrl_ptr)
     return result;
 }
 
-status_t remote_get_bps_reading(remote_ctrl_context_t *remote_ctrl_ptr, uint16_t *result)
-{
-    status_t status = STATUS_ERROR;
-
-    if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
-    {
-        *result = remote_ctrl_ptr->requests.sim_bps;
-        status = STATUS_OK;
-        unlock_sim_sensors(remote_ctrl_ptr);
-    }
-    else
-    {
-        LOG_ERROR("BPS locking error\n");
-    }
-
-    return status;
-}
-
-status_t remote_get_apps_reading(remote_ctrl_context_t *remote_ctrl_ptr, uint16_t *result)
-{
-    status_t status = STATUS_ERROR;
-
-    if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
-    {
-        *result = remote_ctrl_ptr->requests.sim_apps;
-        status = STATUS_OK;
-        unlock_sim_sensors(remote_ctrl_ptr);
-    }
-    else
-    {
-        LOG_ERROR("APPS locking error\n");
-    }
-
-    return status;
-}
-
-uint8_t remote_get_ts_on_reading(remote_ctrl_context_t *remote_ctrl_ptr)
+uint8_t remote_get_ts_on_pressed(remote_ctrl_context_t *remote_ctrl_ptr)
 {
     uint8_t result = 0u;
 
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
-        result = remote_ctrl_ptr->requests.sim_ts_on;
+        bool state = remote_ctrl_ptr->requests.sim_ts_on;
+        result = state && !remote_ctrl_ptr->ts_on_prev;
+        remote_ctrl_ptr->ts_on_prev = state;
         unlock_sim_sensors(remote_ctrl_ptr);
     }
     else
@@ -234,18 +196,20 @@ uint8_t remote_get_ts_on_reading(remote_ctrl_context_t *remote_ctrl_ptr)
     return result;
 }
 
-uint8_t remote_get_r2d_reading(remote_ctrl_context_t *remote_ctrl_ptr)
+uint8_t remote_get_r2d_pressed(remote_ctrl_context_t *remote_ctrl_ptr)
 {
     uint8_t result = 0u;
 
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
-        result = remote_ctrl_ptr->requests.sim_r2_d;
-        if (!can_t_vcu_state_vcu_r2_d_is_in_range(result))
+        bool state = remote_ctrl_ptr->requests.sim_r2_d;
+        if (!can_t_vcu_state_vcu_r2_d_is_in_range(state))
         {
             LOG_WARN("R2D requested is over the limit, setting it to 0\n");
-            result = 0u;
+            state = false;
         }
+        result = state && !remote_ctrl_ptr->r2d_prev;
+        remote_ctrl_ptr->r2d_prev = state;
         unlock_sim_sensors(remote_ctrl_ptr);
     }
     else
@@ -254,23 +218,6 @@ uint8_t remote_get_r2d_reading(remote_ctrl_context_t *remote_ctrl_ptr)
     }
 
     return result;
-}
-
-void remote_ctrl_update_canbc_states(remote_ctrl_context_t *remote_ctrl_ptr)
-{
-    canbc_states_t *states = canbc_lock_state(remote_ctrl_ptr->canbc_ptr, TX_NO_WAIT);
-
-    if (states != NULL)
-    {
-        states->pdm.brakelight = remote_ctrl_ptr->brakelight_pwr;
-        states->sensors.vcu_apps = remote_ctrl_ptr->requests.sim_apps;
-        states->sensors.vcu_bps = remote_ctrl_ptr->requests.sim_bps;
-        canbc_unlock_state(remote_ctrl_ptr->canbc_ptr);
-    }
-    else
-    {
-        LOG_ERROR("CANBC locking failure\n");
-    }
 }
 
 void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr)
@@ -294,27 +241,12 @@ void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr)
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
         remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){0};
+        remote_ctrl_ptr->ts_on_prev = false;
+        remote_ctrl_ptr->r2d_prev = false;
         unlock_sim_sensors(remote_ctrl_ptr);
     }
     else
     {
         LOG_ERROR("Error locking sensors\n");
     }
-}
-
-uint16_t remote_get_power_reading(remote_ctrl_context_t *remote_ctrl_ptr)
-{
-    uint16_t result = 0; // Set initial power to 0
-
-    if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
-    {
-        result = remote_ctrl_ptr->requests.sim_power;
-        unlock_sim_sensors(remote_ctrl_ptr);
-    }
-    else
-    {
-        LOG_ERROR("Power locking error\n");
-    }
-
-    return result;
 }

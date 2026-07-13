@@ -20,12 +20,6 @@ void ctrl_thread_entry(ULONG input);
 void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr);
 void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr);
 void ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr);
-status_t ctrl_get_apps_reading(tick_context_t* tick_ptr,
-                               remote_ctrl_context_t* remote_ctrl_ptr,
-                               uint16_t* result);
-status_t ctrl_get_bps_reading(tick_context_t* tick_ptr,
-                              remote_ctrl_context_t* remote_ctrl_ptr,
-                              uint16_t* result);
 bool ctrl_fan_passed_on_threshold(ctrl_context_t* ctrl_ptr);
 bool ctrl_fan_passed_off_threshold(ctrl_context_t* ctrl_ptr);
 
@@ -260,11 +254,7 @@ static ctrl_state_t ctrl_proc_precharge_wait(ctrl_context_t* ctrl_ptr)
     if (pm100_is_precharged(ctrl_ptr->pm100_ptr)) {
         dash_clear_buttons(ctrl_ptr->dash_ptr);
         LOG_INFO("Precharge complete\n");
-#ifdef VCU_SIMULATION_MODE
-        return CTRL_STATE_SIM_WAIT_TS_ON;
-#else
         return CTRL_STATE_R2D_WAIT;
-#endif
     } else if (charge_time >= ctrl_ptr->config_ptr->precharge_timeout_ticks) {
         ctrl_ptr->error |= CTRL_ERROR_PRECHARGE_TIMEOUT;
         LOG_ERROR("Precharge timeout reached\n");
@@ -301,68 +291,58 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
         ctrl_ptr->inverter_pwr = false; // Turn off inverter
         trc_set_ts_on(GPIO_PIN_RESET);  // Turn off AIRs
 
-#ifdef VCU_SIMULATION_MODE
-        return CTRL_STATE_SIM_WAIT_TS_OFF;
-#else
         return CTRL_STATE_TS_BUTTON_WAIT;
-#endif
     }
 
     if (ctrl_ptr->dash_ptr->r2d_flag) // R2D pressed
     {
-#ifndef VCU_SIMULATION_MODE
         ctrl_ptr->dash_ptr->r2d_flag = false;
-#endif
 
-        status_t result = ctrl_get_bps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                                               &ctrl_ptr->bps_reading);
+        bool r2d = true;
 
-        bool r2d = false;
-
-        if (result == STATUS_OK) {
-            r2d = (ctrl_ptr->config_ptr->r2d_requires_brake) ?
-                (ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) :
-                1;
-
-            if (r2d) {
-                dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
-                pm100_disable(ctrl_ptr->pm100_ptr);
-                rtds_activate(ctrl_ptr->rtds_config_ptr);
-                ctrl_ptr->pump_pwr = 1;
-                ctrl_ptr->apps_bps_start = tx_time_get();
-
-                uint16_t torque_cap = (ctrl_ptr->current_mode == CTRL_MODE_CRAWL || ctrl_ptr->current_mode == CTRL_MODE_REVERSE) 
-                    ? ctrl_ptr->config_ptr->crawl_max_torque 
-                    : (ctrl_ptr->current_mode == CTRL_MODE_ENDURANCE)
-                    ? ctrl_ptr->config_ptr->endurance_max_torque
-                    : ctrl_ptr->config_ptr->hard_max_torque;
-
-                if (torque_cap > ctrl_ptr->config_ptr->hard_max_torque) {
-                    torque_cap = ctrl_ptr->config_ptr->hard_max_torque;
-                }
-
-                if (ctrl_ptr->current_mode == CTRL_MODE_REVERSE) {
-                    ctrl_ptr->pm100_ptr->reverse_mode_dangerous = true;
-                    LOG_WARN("Reverse active");
-                } else {
-                    ctrl_ptr->pm100_ptr->reverse_mode_dangerous = false;
-                }
-
-                ctrl_ptr->torque_map.output_max = torque_cap;
-                LOG_INFO("Torque cap (nm x10)%d\n", ctrl_ptr->torque_map.output_max);
-
-                LOG_INFO("R2D active\n");
-#ifdef VCU_SIMULATION_MODE
-                return CTRL_STATE_SIM_WAIT_R2D_ON;
-#else
-                return CTRL_STATE_TS_ON;
-#endif
-            }
-            return ctrl_ptr->state;
+#ifndef VCU_SIMULATION_MODE
+        status_t result = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
+        if (result != STATUS_OK) {
+            LOG_ERROR("BPS reading failed\n");
+            return CTRL_STATE_TS_ACTIVATION_FAILURE;
         }
 
-        LOG_ERROR("BPS reading failed\n");
-        return CTRL_STATE_TS_ACTIVATION_FAILURE;
+        r2d = (ctrl_ptr->config_ptr->r2d_requires_brake) ?
+            (ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) :
+            1;
+#endif
+
+        if (r2d) {
+            dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
+            pm100_disable(ctrl_ptr->pm100_ptr);
+            rtds_activate(ctrl_ptr->rtds_config_ptr);
+            ctrl_ptr->pump_pwr = 1;
+            ctrl_ptr->apps_bps_start = tx_time_get();
+
+            uint16_t torque_cap = (ctrl_ptr->current_mode == CTRL_MODE_CRAWL || ctrl_ptr->current_mode == CTRL_MODE_REVERSE)
+                ? ctrl_ptr->config_ptr->crawl_max_torque
+                : (ctrl_ptr->current_mode == CTRL_MODE_ENDURANCE)
+                ? ctrl_ptr->config_ptr->endurance_max_torque
+                : ctrl_ptr->config_ptr->hard_max_torque;
+
+            if (torque_cap > ctrl_ptr->config_ptr->hard_max_torque) {
+                torque_cap = ctrl_ptr->config_ptr->hard_max_torque;
+            }
+
+            if (ctrl_ptr->current_mode == CTRL_MODE_REVERSE) {
+                ctrl_ptr->pm100_ptr->reverse_mode_dangerous = true;
+                LOG_WARN("Reverse active");
+            } else {
+                ctrl_ptr->pm100_ptr->reverse_mode_dangerous = false;
+            }
+
+            ctrl_ptr->torque_map.output_max = torque_cap;
+            LOG_INFO("Torque cap (nm x10)%d\n", ctrl_ptr->torque_map.output_max);
+
+            LOG_INFO("R2D active\n");
+            return CTRL_STATE_TS_ON;
+        }
+        return ctrl_ptr->state;
     }
 
     return ctrl_ptr->state;
@@ -376,79 +356,46 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
  */
 static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
 {
-    // read from the APPS
     status_t pm100_status;
-
-    status_t apps_status = ctrl_get_apps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                                                 &ctrl_ptr->apps_reading);
-    status_t bps_status = ctrl_get_bps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                                               &ctrl_ptr->bps_reading);
 
     if (ctrl_ptr->dash_ptr->r2d_flag) {
         dash_clear_buttons(ctrl_ptr->dash_ptr);
-#ifdef VCU_SIMULATION_MODE
-        return CTRL_STATE_SIM_WAIT_R2D_OFF;
-#else
         return CTRL_STATE_R2D_OFF;
-#endif
     }
 
-    if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
-        // Check for brake + accel pedal pressed
-        // if (ctrl_ptr->apps_reading >= ctrl_ptr->config_ptr->apps_bps_high_threshold &&
-        //     ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) {
-            // LOG_ERROR("BP and AP pressed\n");
+#ifndef VCU_SIMULATION_MODE
+    // read from the APPS
+    status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
+    status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
 
-            // if (tx_time_get() >= ctrl_ptr->apps_bps_start + (TX_TIMER_TICKS_PER_SECOND / 3)) {
-            //     LOG_ERROR("BP-AP fault\n");
-            //     return CTRL_STATE_APPS_BPS_FAULT;
-            // }
-        // } else {
-            ctrl_ptr->apps_bps_start = tx_time_get();
-        // }
+    if (apps_status != STATUS_OK || bps_status != STATUS_OK) {
+        LOG_ERROR("APPS / BPS fault\n");
+        return CTRL_STATE_TS_RUN_FAULT;
+    }
+#endif
 
-        int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
+    ctrl_ptr->apps_bps_start = tx_time_get();
 
 #ifdef VCU_SIMULATION_MODE
-#ifndef VCU_SIMULATION_ON_POWER
-        ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
+    ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
 #else
-        uint16_t power = remote_get_power_reading(ctrl_ptr->remote_ctrl_ptr);
-
-        uint16_t rad_s = 1;
-
-        // this if to be removed
-        if (motor_speed < 10) {
-            motor_speed = 10;
-        }
-        // rpm to rad/s
-        rad_s = (uint16_t)(motor_speed * 0.10472);
-        if (rad_s == 0)
-            rad_s = 1;
-        ctrl_ptr->torque_request = (uint16_t)(power / rad_s);
-        if (ctrl_ptr->torque_request > 1500)
-            ctrl_ptr->torque_request = 1500;
-#endif
-#else
-        ctrl_ptr->torque_request =
-            torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
+    int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
+    ctrl_ptr->torque_request =
+        torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
 #endif
 
-        LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);
-        
-        if (ctrl_ptr->torque_request > (ctrl_ptr->config_ptr->hard_max_torque))
-        {
-            ctrl_ptr->torque_request = (ctrl_ptr->config_ptr->hard_max_torque);
-        }
-        pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, ctrl_ptr->torque_request);
+    LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);
 
-        if (pm100_status != STATUS_OK) {
-            return CTRL_STATE_TS_RUN_FAULT;
-        }
-        return ctrl_ptr->state;
+    if (ctrl_ptr->torque_request > (ctrl_ptr->config_ptr->hard_max_torque))
+    {
+        ctrl_ptr->torque_request = (ctrl_ptr->config_ptr->hard_max_torque);
     }
-    LOG_ERROR("APPS / BPS fault\n");
-    return CTRL_STATE_TS_RUN_FAULT;
+    pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, ctrl_ptr->torque_request);
+
+    if (pm100_status != STATUS_OK) {
+        return CTRL_STATE_TS_RUN_FAULT;
+    }
+    return ctrl_ptr->state;
 }
 
 /**
@@ -488,11 +435,7 @@ static ctrl_state_t ctrl_proc_r2d_off_wait(ctrl_context_t* ctrl_ptr)
     }
 
     if (tx_time_get() >= ctrl_ptr->motor_torque_zero_start + TX_TIMER_TICKS_PER_SECOND / 2) {
-#ifdef VCU_SIMULATION_MODE
-        return CTRL_STATE_SIM_WAIT_R2D_OFF;
-#else
         return CTRL_STATE_R2D_WAIT;
-#endif
     }
 
     return ctrl_ptr->state;
@@ -514,12 +457,15 @@ static ctrl_state_t ctrl_proc_apps_scs_fault(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_RUN_FAULT;
     }
 
-    if (ctrl_get_apps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                              &ctrl_ptr->apps_reading) == STATUS_OK) {
+#ifndef VCU_SIMULATION_MODE
+    if (tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading) == STATUS_OK) {
         return CTRL_STATE_TS_ON;
     }
 
     return ctrl_ptr->state;
+#else
+    return CTRL_STATE_TS_ON;
+#endif
 }
 
 /**
@@ -537,10 +483,9 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_RUN_FAULT;
     }
 
-    status_t apps_status = ctrl_get_apps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                                                 &ctrl_ptr->apps_reading);
-    status_t bps_status = ctrl_get_bps_reading(ctrl_ptr->tick_ptr, ctrl_ptr->remote_ctrl_ptr,
-                                               &ctrl_ptr->bps_reading);
+#ifndef VCU_SIMULATION_MODE
+    status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
+    status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
 
     if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
         if ((ctrl_ptr->apps_reading < ctrl_ptr->config_ptr->apps_bps_low_threshold) &&
@@ -549,96 +494,9 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
         }
     }
     return CTRL_STATE_APPS_SCS_FAULT;
-}
-
-/**
- * @brief Needed when in simulation mode to avoid the TS being turned on again
- *
- * @param ctrl_ptr
- * @return ctrl_state_t next state
- */
-static ctrl_state_t ctrl_proc_sim_wait_ts_off(ctrl_context_t* ctrl_ptr)
-{
-    ctrl_ptr->torque_request = 0;
-    status_t pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
-
-    if (pm100_status != STATUS_OK) {
-        return CTRL_STATE_TS_RUN_FAULT;
-    }
-
-    if (!ctrl_ptr->dash_ptr->tson_flag) {
-        return CTRL_STATE_TS_BUTTON_WAIT;
-    }
-
-    return ctrl_ptr->state;
-}
-
-/**
- * @brief Needed when in simulation mode to avoid the TS being turned off again
- *
- * @param ctrl_ptr
- * @return ctrl_state_t next state
- */
-static ctrl_state_t ctrl_proc_sim_wait_ts_on(ctrl_context_t* ctrl_ptr)
-{
-    ctrl_ptr->torque_request = 0;
-    status_t pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
-
-    if (pm100_status != STATUS_OK) {
-        return CTRL_STATE_TS_RUN_FAULT;
-    }
-
-    if (!ctrl_ptr->dash_ptr->tson_flag) {
-        return CTRL_STATE_R2D_WAIT;
-    }
-
-    return ctrl_ptr->state;
-}
-
-/**
- * @brief Needed when in simulation mode to avoid the R2D being turned off again
- *
- * @param ctrl_ptr
- * @return ctrl_state_t next state
- */
-static ctrl_state_t ctrl_proc_sim_wait_r2d_on(ctrl_context_t* ctrl_ptr)
-{
-    ctrl_ptr->torque_request = 0;
-    status_t pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
-
-    if (pm100_status != STATUS_OK) {
-        return CTRL_STATE_TS_RUN_FAULT;
-    }
-
-    if (!ctrl_ptr->dash_ptr->r2d_flag) {
-        ctrl_ptr->apps_bps_start = tx_time_get();
-        return CTRL_STATE_TS_ON;
-    }
-
-    return ctrl_ptr->state;
-}
-
-/**
- * @brief Needed when in simulation mode to avoid the R2D being turned on again
- *
- * @param ctrl_ptr
- * @return ctrl_state_t next state
- */
-static ctrl_state_t ctrl_proc_sim_wait_r2d_off(ctrl_context_t* ctrl_ptr)
-{
-    ctrl_ptr->torque_request = 0;
-    status_t pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
-
-    if (pm100_status != STATUS_OK) {
-        return CTRL_STATE_TS_RUN_FAULT;
-    }
-
-    if (!ctrl_ptr->dash_ptr->r2d_flag) {
-        dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
-        return CTRL_STATE_R2D_WAIT;
-    }
-
-    return ctrl_ptr->state;
+#else
+    return CTRL_STATE_TS_ON;
+#endif
 }
 
 /**
@@ -654,9 +512,9 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
 // control, but the dash is still in effect
 #ifdef VCU_SIMULATION_MODE
     ctrl_ptr->dash_ptr->tson_flag = ctrl_ptr->dash_ptr->tson_flag ||
-        remote_get_ts_on_reading(ctrl_ptr->remote_ctrl_ptr);
+        remote_get_ts_on_pressed(ctrl_ptr->remote_ctrl_ptr);
     ctrl_ptr->dash_ptr->r2d_flag = ctrl_ptr->dash_ptr->r2d_flag ||
-        remote_get_r2d_reading(ctrl_ptr->remote_ctrl_ptr);
+        remote_get_r2d_pressed(ctrl_ptr->remote_ctrl_ptr);
 #endif
 
     switch (ctrl_ptr->state) {
@@ -705,22 +563,6 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
     }
     case CTRL_STATE_APPS_BPS_FAULT: {
         next_state = ctrl_proc_apps_bps_fault(ctrl_ptr);
-        break;
-    }
-    case CTRL_STATE_SIM_WAIT_TS_OFF: {
-        next_state = ctrl_proc_sim_wait_ts_off(ctrl_ptr);
-        break;
-    }
-    case CTRL_STATE_SIM_WAIT_TS_ON: {
-        next_state = ctrl_proc_sim_wait_ts_on(ctrl_ptr);
-        break;
-    }
-    case CTRL_STATE_SIM_WAIT_R2D_ON: {
-        next_state = ctrl_proc_sim_wait_r2d_on(ctrl_ptr);
-        break;
-    }
-    case CTRL_STATE_SIM_WAIT_R2D_OFF: {
-        next_state = ctrl_proc_sim_wait_r2d_off(ctrl_ptr);
         break;
     }
     default: break;
@@ -776,25 +618,4 @@ void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr)
         states->pdm.fan = ctrl_ptr->fan_pwr || ctrl_ptr->fans_ptr->fan_switch_status;
         canbc_unlock_state(ctrl_ptr->canbc_ptr);
     }
-}
-
-status_t ctrl_get_apps_reading(tick_context_t* tick_ptr,
-                               remote_ctrl_context_t* remote_ctrl_ptr,
-                               uint16_t* result)
-{
-#ifdef VCU_SIMULATION_MODE
-    return remote_get_apps_reading(remote_ctrl_ptr, result);
-#else
-    return tick_get_apps_reading(tick_ptr, result);
-#endif
-}
-status_t ctrl_get_bps_reading(tick_context_t* tick_ptr,
-                              remote_ctrl_context_t* remote_ctrl_ptr,
-                              uint16_t* result)
-{
-#ifdef VCU_SIMULATION_MODE
-    return remote_get_bps_reading(remote_ctrl_ptr, result);
-#else
-    return tick_get_bps_reading(tick_ptr, result);
-#endif
 }

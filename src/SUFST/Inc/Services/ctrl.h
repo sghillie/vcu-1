@@ -53,10 +53,6 @@ typedef enum
      CTRL_STATE_SPIN,
      CTRL_STATE_APPS_SCS_FAULT,
      CTRL_STATE_APPS_BPS_FAULT,
-     CTRL_STATE_SIM_WAIT_TS_OFF,
-     CTRL_STATE_SIM_WAIT_TS_ON,
-     CTRL_STATE_SIM_WAIT_R2D_OFF,
-     CTRL_STATE_SIM_WAIT_R2D_ON,
 } ctrl_state_t;
 
 // Note if changing these, check the line in ctrl.c starting with
