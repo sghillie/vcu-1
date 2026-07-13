@@ -38,7 +38,7 @@
       </Object>
       <Property Name="Name">X0d92b3b7e856ee4c01ebfe8e1609863a31d2</Property>
       <Property Name="Size">134, 141</Property>
-      <Property Name="Location">10, 366</Property>
+      <Property Name="Location">10, 291</Property>
       <Property Name="Text">Bus Loads</Property>
       <Property Name="TabIndex">20</Property>
       <Property Name="UseWindowsStyle">False</Property>
@@ -276,7 +276,7 @@
       </Object>
       <Property Name="Name">Xa6ca64b3e0645e4d88eabfaea54d62ad1c24</Property>
       <Property Name="Size">336, 169</Property>
-      <Property Name="Location">418, 338</Property>
+      <Property Name="Location">150, 263</Property>
       <Property Name="Text">Temperatures (C)</Property>
       <Property Name="TabIndex">17</Property>
       <Property Name="UseWindowsStyle">False</Property>
@@ -372,112 +372,6 @@
       <Property Name="Location">510, 102</Property>
       <Property Name="Text">Wheelspeeds (m/s)</Property>
       <Property Name="TabIndex">11</Property>
-      <Property Name="UseWindowsStyle">False</Property>
-    </Object>
-    <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X8639ce53e839ee474aea145e6907ebb0c367" ControlName="Simulation">
-      <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Xe2da773ae06e7e4427ea644ef17f382f3171" ControlName="Button 3">
-        <Property Name="Name">Xe2da773ae06e7e4427ea644ef17f382f3171</Property>
-        <Property Name="Size">95, 23</Property>
-        <Property Name="Location">5, 245</Property>
-        <Property Name="TabIndex">9</Property>
-        <Property Name="Text">SIM_R2D_OFF</Property>
-        <Property Name="PressValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;</Property>
-        <Property Name="PressValueVT">1;Lower;0</Property>
-        <Property Name="PressValue">0</Property>
-        <Property Name="ReleaseValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;</Property>
-        <Property Name="ReleaseValueVT">1;Lower;0</Property>
-        <Property Name="ReleaseValue">0</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;R2D;1;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X931a0e5ae10f0e449ce9d68edd7e1d589557" ControlName="Button 2">
-        <Property Name="Name">X931a0e5ae10f0e449ce9d68edd7e1d589557</Property>
-        <Property Name="Size">95, 23</Property>
-        <Property Name="Location">5, 274</Property>
-        <Property Name="TabIndex">8</Property>
-        <Property Name="Text">SIM_TS_OFF</Property>
-        <Property Name="PressValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;</Property>
-        <Property Name="PressValueVT">1;Lower;0</Property>
-        <Property Name="PressValue">0</Property>
-        <Property Name="ReleaseValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;</Property>
-        <Property Name="ReleaseValueVT">1;Lower;0</Property>
-        <Property Name="ReleaseValue">0</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;TS_ON;1;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Xaf07127be48c0e4a43eaeeaebc5e0386fb0f" ControlName="Button 1">
-        <Property Name="Name">Xaf07127be48c0e4a43eaeeaebc5e0386fb0f</Property>
-        <Property Name="Size">95, 65</Property>
-        <Property Name="Location">5, 170</Property>
-        <Property Name="UseWindowsStyle">False</Property>
-        <Property Name="BackColor">255, 255, 155, 152</Property>
-        <Property Name="TabIndex">7</Property>
-        <Property Name="Font">Microsoft Sans Serif, 10pt, style=Bold</Property>
-        <Property Name="Text">ZERO SIM_APPS</Property>
-        <Property Name="PressValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;0&lt;/RxValue&gt;</Property>
-        <Property Name="PressValueVT">1;Lower;0</Property>
-        <Property Name="PressValue">0</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;APPS;2;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.NumericUpDownControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X6fd2b3e7e4b98e4f05ea612e141e2cefa03f" ControlName="Numeric Up/Down 2">
-        <Property Name="Name">X6fd2b3e7e4b98e4f05ea612e141e2cefa03f</Property>
-        <Property Name="Size">53, 18</Property>
-        <Property Name="Location">28, 146</Property>
-        <Property Name="DecimalPlaces">1</Property>
-        <Property Name="TabIndex">6</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;BPS;2;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.NumericUpDownControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Xf49a006ae4bdfe471aea6e1e4a63905a6190" ControlName="Numeric Up/Down 1">
-        <Property Name="Name">Xf49a006ae4bdfe471aea6e1e4a63905a6190</Property>
-        <Property Name="Size">53, 18</Property>
-        <Property Name="Location">28, 97</Property>
-        <Property Name="DecimalPlaces">1</Property>
-        <Property Name="TabIndex">5</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;APPS;2;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X293c79e5e4458e427fe9779e1c37ceaa1f33" ControlName="Static Text 24">
-        <Property Name="Name">X293c79e5e4458e427fe9779e1c37ceaa1f33</Property>
-        <Property Name="Size">69, 15</Property>
-        <Property Name="Location">18, 125</Property>
-        <Property Name="Text">SIM_BPS %</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.StaticTextControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X18bd42e6e9748e4612e8843eac19eea701f9" ControlName="Static Text 23">
-        <Property Name="Name">X18bd42e6e9748e4612e8843eac19eea701f9</Property>
-        <Property Name="Size">76, 15</Property>
-        <Property Name="Location">14, 76</Property>
-        <Property Name="Text">SIM_APPS %</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X8c57a6b2e9d65e4df6eb5a8ed91f0edfc248" ControlName="SIM_R2D">
-        <Property Name="Name">X8c57a6b2e9d65e4df6eb5a8ed91f0edfc248</Property>
-        <Property Name="Size">95, 23</Property>
-        <Property Name="Location">5, 47</Property>
-        <Property Name="TabIndex">4</Property>
-        <Property Name="Text">SIM_R2D</Property>
-        <Property Name="PressValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;</Property>
-        <Property Name="PressValueVT">1;Lower;1</Property>
-        <Property Name="PressValue">1</Property>
-        <Property Name="ReleaseValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;</Property>
-        <Property Name="ReleaseValueVT">1;Lower;1</Property>
-        <Property Name="ReleaseValue">1</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;R2D;1;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Object Type="Vector.CANalyzer.Panels.Design.ButtonControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="Xa5dee07de6ff8e463dea29beb640d97f3abe" ControlName="SIM_TS_ON">
-        <Property Name="Name">Xa5dee07de6ff8e463dea29beb640d97f3abe</Property>
-        <Property Name="Size">95, 23</Property>
-        <Property Name="Location">5, 18</Property>
-        <Property Name="TabIndex">3</Property>
-        <Property Name="Text">SIM_TS_ON</Property>
-        <Property Name="PressValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;</Property>
-        <Property Name="PressValueVT">1;Lower;1</Property>
-        <Property Name="PressValue">1</Property>
-        <Property Name="ReleaseValueVTXml">&lt;Version&gt;2&lt;/Version&gt;&lt;LowerUpper&gt;Lower&lt;/LowerUpper&gt;&lt;RxValue&gt;1&lt;/RxValue&gt;</Property>
-        <Property Name="ReleaseValueVT">1;Lower;1</Property>
-        <Property Name="ReleaseValue">1</Property>
-        <Property Name="SymbolConfiguration">8;16;VCU_Sim;;;TS_ON;1;;;-1;;;Value;;;0</Property>
-      </Object>
-      <Property Name="Name">X8639ce53e839ee474aea145e6907ebb0c367</Property>
-      <Property Name="Size">106, 302</Property>
-      <Property Name="Location">790, 5</Property>
-      <Property Name="Text">Simulation</Property>
-      <Property Name="TabIndex">10</Property>
       <Property Name="UseWindowsStyle">False</Property>
     </Object>
     <Object Type="Vector.CANalyzer.Panels.Design.GroupBoxControl, Vector.CANalyzer.Panels.CommonControls, Version=18.0.150.0, Culture=neutral, PublicKeyToken=null" Name="X0b7460d4eb617e4d44eb495e02bbd00ec490" ControlName="Shutdown Loop State">
