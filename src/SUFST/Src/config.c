@@ -73,7 +73,7 @@ static const config_t config_instance = {
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.5f
         },
-        .max_discrepancy = 70, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
+        .max_discrepancy = 120, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
         .inverted = true
     },
     .bps = {
