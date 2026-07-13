@@ -279,7 +279,7 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
 
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;   
     // Stay in R2D_Wait on an unknown mode (e.g. blank spot or inverter programming)s
-    if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode > CTRL_MODE_REVERSE)
+    if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode > CTRL_MODE_REMOTE_CTRL)
     {
         return ctrl_ptr->state;
     }
@@ -300,17 +300,17 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
 
         bool r2d = true;
 
-#ifndef VCU_SIMULATION_MODE
-        status_t result = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
-        if (result != STATUS_OK) {
-            LOG_ERROR("BPS reading failed\n");
-            return CTRL_STATE_TS_ACTIVATION_FAILURE;
-        }
+        if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL) {
+            status_t result = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
+            if (result != STATUS_OK) {
+                LOG_ERROR("BPS reading failed\n");
+                return CTRL_STATE_TS_ACTIVATION_FAILURE;
+            }
 
-        r2d = (ctrl_ptr->config_ptr->r2d_requires_brake) ?
-            (ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) :
-            1;
-#endif
+            r2d = (ctrl_ptr->config_ptr->r2d_requires_brake) ?
+                (ctrl_ptr->bps_reading > ctrl_ptr->config_ptr->bps_on_threshold) :
+                1;
+        }
 
         if (r2d) {
             dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
@@ -363,26 +363,26 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_R2D_OFF;
     }
 
-#ifndef VCU_SIMULATION_MODE
-    // read from the APPS
-    status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
-    status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
+    if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL) {
+        // read from the APPS
+        status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
+        status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
 
-    if (apps_status != STATUS_OK || bps_status != STATUS_OK) {
-        LOG_ERROR("APPS / BPS fault\n");
-        return CTRL_STATE_TS_RUN_FAULT;
+        if (apps_status != STATUS_OK || bps_status != STATUS_OK) {
+            LOG_ERROR("APPS / BPS fault\n");
+            return CTRL_STATE_TS_RUN_FAULT;
+        }
     }
-#endif
 
     ctrl_ptr->apps_bps_start = tx_time_get();
 
-#ifdef VCU_SIMULATION_MODE
-    ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
-#else
-    int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
-    ctrl_ptr->torque_request =
-        torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
-#endif
+    if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL) {
+        int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
+        ctrl_ptr->torque_request =
+            torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
+    } else {
+        ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
+    }
 
     LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);
 
@@ -457,15 +457,11 @@ static ctrl_state_t ctrl_proc_apps_scs_fault(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_RUN_FAULT;
     }
 
-#ifndef VCU_SIMULATION_MODE
     if (tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading) == STATUS_OK) {
         return CTRL_STATE_TS_ON;
     }
 
     return ctrl_ptr->state;
-#else
-    return CTRL_STATE_TS_ON;
-#endif
 }
 
 /**
@@ -483,7 +479,6 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_RUN_FAULT;
     }
 
-#ifndef VCU_SIMULATION_MODE
     status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
     status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
 
@@ -494,9 +489,6 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
         }
     }
     return CTRL_STATE_APPS_SCS_FAULT;
-#else
-    return CTRL_STATE_TS_ON;
-#endif
 }
 
 /**
@@ -508,13 +500,16 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
 {
     ctrl_state_t next_state = ctrl_ptr->state;
 
-// In simulation mode, the TS and R2D buttons are controlled by the remote
-// control, but the dash is still in effect
-#ifdef VCU_SIMULATION_MODE
-    ctrl_ptr->dash_ptr->tson_flag = ctrl_ptr->dash_ptr->tson_flag ||
-        remote_get_ts_on_pressed(ctrl_ptr->remote_ctrl_ptr);
-    ctrl_ptr->dash_ptr->r2d_flag = ctrl_ptr->dash_ptr->r2d_flag ||
-        remote_get_r2d_pressed(ctrl_ptr->remote_ctrl_ptr);
+// In remote control mode, the TS and R2D buttons can additionally be
+// triggered by the remote control, but the dash button is still in effect.
+// In every other mode, TS and R2D must be physically pressed.
+#ifdef ENABLE_VCU_SIMULATION_MODE
+    if (ctrl_ptr->current_mode == CTRL_MODE_REMOTE_CTRL) {
+        ctrl_ptr->dash_ptr->tson_flag = ctrl_ptr->dash_ptr->tson_flag ||
+            remote_get_ts_on_pressed(ctrl_ptr->remote_ctrl_ptr);
+        ctrl_ptr->dash_ptr->r2d_flag = ctrl_ptr->dash_ptr->r2d_flag ||
+            remote_get_r2d_pressed(ctrl_ptr->remote_ctrl_ptr);
+    }
 #endif
 
     switch (ctrl_ptr->state) {

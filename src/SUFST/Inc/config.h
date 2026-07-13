@@ -18,9 +18,10 @@
 
 #include "torque_map_funcs.h"
 
-// Should be defined if the VCU is in simulation mode
-// When not defined(commented out) - the VCU is in normal mode(using apps and bps sensors)
-// #define VCU_SIMULATION_MODE
+// Should be defined if remote control (CTRL_MODE_REMOTE_CTRL) support is compiled in.
+// When not defined (commented out), selecting the remote control mode on the switch
+// is harmless but always requests 0 torque and ignores R2D
+#define ENABLE_VCU_SIMULATION_MODE
 
 /**
  * @brief  Threads
