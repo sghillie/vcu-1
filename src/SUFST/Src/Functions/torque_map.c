@@ -48,6 +48,7 @@ status_t torque_map_init(torque_map_t* map_ptr,
         break;
     };
 
+    map_ptr->output_max = config_ptr->output_max;
     map_ptr->speed_min = config_ptr->speed_min;
     map_ptr->speed_start = config_ptr->speed_start;
     map_ptr->speed_end = config_ptr->speed_end;
@@ -108,7 +109,7 @@ uint16_t null_torque_map(torque_map_t* map_ptr, uint16_t input)
  */
 uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input)
 {
-    const float scale_factor = map_ptr->config_ptr->output_max
+    const float scale_factor = map_ptr->output_max
                                / (float) map_ptr->config_ptr->input_max;
 
     const uint16_t torque = (uint16_t) (input * scale_factor);
@@ -142,8 +143,8 @@ uint16_t apply_speed_limit(torque_map_t* map_ptr, uint16_t input, int16_t speed)
     else
     {
         uint16_t max_torque
-            = map_ptr->config_ptr->output_max
-              - (map_ptr->config_ptr->output_max - map_ptr->speed_min)
+            = map_ptr->output_max
+              - (map_ptr->output_max - map_ptr->speed_min)
                     * (speed - map_ptr->speed_start)
                     / (map_ptr->speed_end - map_ptr->speed_start);
 
