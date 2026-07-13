@@ -389,6 +389,21 @@ int16_t pm100_motor_speed(pm100_context_t* pm100_ptr)
     return speed;
 }
 
+/**
+ * @brief       Clears the latched PM100 error flags
+ * @param[in]   pm100_ptr   PM100 context
+ */
+void pm100_clear_error(pm100_context_t* pm100_ptr)
+{
+    UINT tx_status = tx_mutex_get(&pm100_ptr->state_mutex, 100);
+
+    if (tx_status == TX_SUCCESS)
+    {
+        pm100_ptr->error = PM100_ERROR_NONE;
+        tx_mutex_put(&pm100_ptr->state_mutex);
+    }
+}
+
 status_t pm100_lvs_off(pm100_context_t* pm100_ptr)
 {
     return STATUS_OK;

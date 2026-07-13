@@ -216,6 +216,23 @@ status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result)
     return status;
 }
 
+status_t tick_clear_apps_scs_error(tick_context_t* tick_ptr)
+{
+    status_t status = lock_tick_sensors(tick_ptr, 100);
+
+    if (status == STATUS_OK)
+    {
+        tick_ptr->apps.scs_error = SCS_ERROR_NONE;
+        unlock_tick_sensors(tick_ptr);
+    }
+    else
+    {
+        LOG_ERROR("APPS locking error\n");
+    }
+
+    return status;
+}
+
 status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result)
 {
     status_t status = STATUS_ERROR;

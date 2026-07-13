@@ -45,5 +45,6 @@ status_t tick_get_bps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_mode_adc_reading(tick_context_t* tick_ptr, uint16_t* result);
+status_t tick_clear_apps_scs_error(tick_context_t* tick_ptr);
 
 #endif /* TICK_H */

@@ -19,7 +19,6 @@
 void ctrl_thread_entry(ULONG input);
 void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr);
 void ctrl_update_canbc_states(ctrl_context_t* ctrl_ptr);
-void ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr);
 bool ctrl_fan_passed_on_threshold(ctrl_context_t* ctrl_ptr);
 bool ctrl_fan_passed_off_threshold(ctrl_context_t* ctrl_ptr);
 
@@ -492,6 +491,40 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
 }
 
 /**
+ * @brief       Handles an initialisation or runtime fault of the TS and shuts
+ *              down the service
+ *
+ * @param[in]   ctrl_ptr    Control context
+ */
+static ctrl_state_t ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr)
+{
+
+    dash_context_t* dash_ptr = ctrl_ptr->dash_ptr;
+    const config_ctrl_t* config_ptr = ctrl_ptr->config_ptr;
+
+    pm100_lvs_off(ctrl_ptr->pm100_ptr);
+    // ctrl_ptr->inverter_pwr = false;
+    pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
+    ctrl_ptr->pump_pwr = false;
+    ctrl_ptr->fan_pwr = false;
+
+    trc_set_ts_on(GPIO_PIN_RESET);
+    dash_blink_ts_on_led(dash_ptr, config_ptr->error_led_toggle_ticks);
+    ctrl_update_canbc_states(ctrl_ptr);
+    
+    if (ctrl_ptr->dash_ptr->tson_flag) {
+        ctrl_ptr->dash_ptr->tson_flag = false;
+
+        ctrl_ptr->error = CTRL_ERROR_NONE;
+        pm100_clear_error(ctrl_ptr->pm100_ptr);
+        tick_clear_apps_scs_error(ctrl_ptr->tick_ptr);
+
+        return CTRL_STATE_TS_BUTTON_WAIT;
+    }
+    return CTRL_STATE_TS_RUN_FAULT;
+}
+
+/**
  * @brief       Runs one tick of the state machine for the control service
  *
  * @param[in]   ctrl_ptr    Control context
@@ -545,7 +578,7 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
     case CTRL_STATE_TS_ACTIVATION_FAILURE:
     case CTRL_STATE_TS_RUN_FAULT: {
         LOG_ERROR("TS fault during activation or runtime\n");
-        ctrl_handle_ts_fault(ctrl_ptr);
+        next_state = ctrl_handle_ts_fault(ctrl_ptr);
         break;
     }
     case CTRL_STATE_SPIN: {
@@ -564,28 +597,6 @@ void ctrl_state_machine_tick(ctrl_context_t* ctrl_ptr)
     }
 
     ctrl_ptr->state = next_state;
-}
-
-/**
- * @brief       Handles an initialisation or runtime fault of the TS and shuts
- *              down the service
- *
- * @param[in]   ctrl_ptr    Control context
- */
-void ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr)
-{
-    dash_context_t* dash_ptr = ctrl_ptr->dash_ptr;
-    const config_ctrl_t* config_ptr = ctrl_ptr->config_ptr;
-
-    pm100_lvs_off(ctrl_ptr->pm100_ptr);
-    // ctrl_ptr->inverter_pwr = false;
-    pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
-    ctrl_ptr->pump_pwr = false;
-    ctrl_ptr->fan_pwr = false;
-
-    trc_set_ts_on(GPIO_PIN_RESET);
-    dash_blink_ts_on_led(dash_ptr, config_ptr->error_led_toggle_ticks);
-    ctrl_update_canbc_states(ctrl_ptr);
 }
 
 /**

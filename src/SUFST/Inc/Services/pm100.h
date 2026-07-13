@@ -71,5 +71,6 @@ int16_t pm100_max_inverter_temp(pm100_context_t *pm100_ptr);
 int16_t pm100_motor_speed(pm100_context_t *pm100_ptr);
 status_t pm100_disable(pm100_context_t* pm100_ptr);
 status_t pm100_request_torque(pm100_context_t* pm100_ptr, uint16_t torque);
+void pm100_clear_error(pm100_context_t* pm100_ptr);
 
 #endif
