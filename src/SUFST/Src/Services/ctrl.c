@@ -199,6 +199,7 @@ bool ctrl_fan_passed_off_threshold(ctrl_context_t* ctrl_ptr)
 static ctrl_state_t ctrl_proc_ts_button_wait(ctrl_context_t* ctrl_ptr)
 {
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
     if (ctrl_ptr->dash_ptr->tson_flag) {
         dash_clear_buttons(ctrl_ptr->dash_ptr);
 
@@ -270,12 +271,13 @@ static ctrl_state_t ctrl_proc_precharge_wait(ctrl_context_t* ctrl_ptr)
  * @return ctrl_state_t next state
  */
 static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
-{        
+{   
     if (!trc_ready()) {
         LOG_ERROR("SHDN opened\n");
         return CTRL_STATE_TS_ACTIVATION_FAILURE;
     }
 
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;   
     // Stay in R2D_Wait on an unknown mode (e.g. blank spot or inverter programming)s
     if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode > CTRL_MODE_REMOTE_CTRL)
@@ -510,6 +512,7 @@ static ctrl_state_t ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr)
 
     trc_set_ts_on(GPIO_PIN_RESET);
     dash_blink_ts_on_led(dash_ptr, config_ptr->error_led_toggle_ticks);
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
     ctrl_update_canbc_states(ctrl_ptr);
     
     if (ctrl_ptr->dash_ptr->tson_flag) {
