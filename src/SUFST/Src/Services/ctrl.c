@@ -199,7 +199,7 @@ bool ctrl_fan_passed_off_threshold(ctrl_context_t* ctrl_ptr)
 static ctrl_state_t ctrl_proc_ts_button_wait(ctrl_context_t* ctrl_ptr)
 {
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;
-    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
     if (ctrl_ptr->dash_ptr->tson_flag) {
         dash_clear_buttons(ctrl_ptr->dash_ptr);
 
@@ -277,7 +277,7 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_ACTIVATION_FAILURE;
     }
 
-    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
     ctrl_ptr->current_mode = ctrl_ptr->requested_mode;   
     // Stay in R2D_Wait on an unknown mode (e.g. blank spot or inverter programming)s
     if (ctrl_ptr->current_mode == CTRL_MODE_UNKNOWN || ctrl_ptr->current_mode > CTRL_MODE_REMOTE_CTRL)
@@ -314,7 +314,7 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
         }
 
         if (r2d) {
-            dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
+            dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
             pm100_disable(ctrl_ptr->pm100_ptr);
             rtds_activate(ctrl_ptr->rtds_config_ptr);
             ctrl_ptr->pump_pwr = 1;
@@ -427,7 +427,7 @@ static ctrl_state_t ctrl_proc_r2d_off(ctrl_context_t* ctrl_ptr)
  */
 static ctrl_state_t ctrl_proc_r2d_off_wait(ctrl_context_t* ctrl_ptr)
 {
-    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
     ctrl_ptr->torque_request = 0;
     status_t pm100_status = pm100_request_torque(ctrl_ptr->pm100_ptr, 0);
 
@@ -512,7 +512,7 @@ static ctrl_state_t ctrl_handle_ts_fault(ctrl_context_t* ctrl_ptr)
 
     trc_set_ts_on(GPIO_PIN_RESET);
     dash_blink_ts_on_led(dash_ptr, config_ptr->error_led_toggle_ticks);
-    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_RESET);
+    dash_set_r2d_led_state(ctrl_ptr->dash_ptr, GPIO_PIN_SET);
     ctrl_update_canbc_states(ctrl_ptr);
     
     if (ctrl_ptr->dash_ptr->tson_flag) {
