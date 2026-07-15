@@ -371,7 +371,7 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
 
         if (apps_status != STATUS_OK || bps_status != STATUS_OK) {
             LOG_ERROR("APPS / BPS fault\n");
-            return CTRL_STATE_TS_RUN_FAULT;
+            return CTRL_STATE_APPS_SCS_FAULT;
         }
     }
 
@@ -458,7 +458,10 @@ static ctrl_state_t ctrl_proc_apps_scs_fault(ctrl_context_t* ctrl_ptr)
         return CTRL_STATE_TS_RUN_FAULT;
     }
 
-    if (tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading) == STATUS_OK) {
+    status_t apps_status = tick_get_apps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->apps_reading);
+    status_t bps_status = tick_get_bps_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->bps_reading);
+
+    if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
         return CTRL_STATE_TS_ON;
     }
 
