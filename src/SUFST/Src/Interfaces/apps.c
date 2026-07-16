@@ -43,6 +43,7 @@ status_t apps_init(apps_context_t* apps_ptr, const config_apps_t* config_ptr)
 status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
 {
     status_t status = STATUS_OK;
+    uint8_t scs_error = SCS_ERROR_NONE;
     uint16_t reading_1 = 0;
     uint16_t reading_2 = 0;
 
@@ -74,13 +75,13 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     if (status_1 != STATUS_OK)
     {
         status = STATUS_ERROR;
-        apps_ptr->scs_error |= SCS_ERROR_APPS1;
+        scs_error |= SCS_ERROR_APPS1;
     }
 
     if (status_2 != STATUS_OK)
     {
         status = STATUS_ERROR;
-        apps_ptr->scs_error |= SCS_ERROR_APPS2;
+        scs_error |= SCS_ERROR_APPS2;
     }
 
     // check for discrepancy
@@ -90,7 +91,7 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     if (diff > apps_ptr->config_ptr->max_discrepancy)
     {
         status = STATUS_ERROR;
-        apps_ptr->scs_error |= SCS_ERROR_APPS_DISCREPANCY;
+        scs_error |= SCS_ERROR_APPS_DISCREPANCY;
         
         LOG_WARN("APPS A1:%d[%s] A2:%d[%s] diff:%d[!]\n",
                 reading_1, scs_label(status_1, status_1_verbose),
@@ -106,6 +107,7 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     // return reading
     *reading_ptr = (status == STATUS_OK) ? reading_2 : 0; //(reading_1 + reading_2) / 2;
 
+    apps_ptr->scs_error = scs_error;
     return status;
 }
 
