@@ -73,7 +73,7 @@ static const config_t config_instance = {
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.5f
         },
-        .max_discrepancy = 120, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
+        .max_discrepancy = 240, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
         .inverted = true
     },
     .bps = {
@@ -145,7 +145,7 @@ static const config_t config_instance = {
             .stack_size = 1024
         },
         .period = SECONDS_TO_TICKS(0.01),
-        .bps_threshold = 20, // Turn breaklight on at 2%
+        .bps_threshold = 200, // Turn breaklight on at 2%
         .bps_active_ticks = SECONDS_TO_TICKS(0.3), // debounce: BPS must be above threshold for 0.3s
 
     },
