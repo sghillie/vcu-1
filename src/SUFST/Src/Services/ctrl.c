@@ -378,6 +378,25 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
     ctrl_ptr->apps_bps_start = tx_time_get();
 
     if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL) {
+        // Check for brake + accel pedal pressed
+        if (ctrl_ptr->apps_reading
+                >= ctrl_ptr->config_ptr->apps_bps_high_threshold
+            && ctrl_ptr->canbc_ptr->states.pdm.brakelight)
+        {
+            LOG_ERROR("BP and AP pressed\n");
+
+            if (tx_time_get() >= ctrl_ptr->apps_bps_start
+                                        + (TX_TIMER_TICKS_PER_SECOND / 3))
+            {
+                LOG_ERROR("BP-AP fault\n");
+                return CTRL_STATE_APPS_BPS_FAULT;
+            }
+        }
+        else
+        {
+            ctrl_ptr->apps_bps_start = tx_time_get();
+        }
+
         int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
         ctrl_ptr->torque_request =
             torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
@@ -488,7 +507,7 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
 
     if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
         if ((ctrl_ptr->apps_reading < ctrl_ptr->config_ptr->apps_bps_low_threshold) &&
-            (ctrl_ptr->bps_reading < ctrl_ptr->config_ptr->bps_on_threshold)) {
+            !ctrl_ptr->canbc_ptr->states.pdm.brakelight) {
             return CTRL_STATE_TS_ON;
         }
     }

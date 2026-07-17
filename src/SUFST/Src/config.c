@@ -145,8 +145,9 @@ static const config_t config_instance = {
             .stack_size = 1024
         },
         .period = SECONDS_TO_TICKS(0.01),
-        .bps_light_threshold = 20, // Turn breaklight on at 2%
-        .bps_light_active_ticks = SECONDS_TO_TICKS(0.3) // debounce: BPS must be above threshold for 0.3s
+        .bps_threshold = 20, // Turn breaklight on at 2%
+        .bps_active_ticks = SECONDS_TO_TICKS(0.3), // debounce: BPS must be above threshold for 0.3s
+
     },
     .remote_ctrl = {
         .thread = {
