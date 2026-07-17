@@ -375,8 +375,6 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
         }
     }
 
-    ctrl_ptr->apps_bps_start = tx_time_get();
-
     if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL) {
         // Check for brake + accel pedal pressed
         if (ctrl_ptr->apps_reading
@@ -508,14 +506,19 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t* ctrl_ptr)
 
     if (apps_status == STATUS_OK && bps_status == STATUS_OK) {
         if ((ctrl_ptr->apps_reading < ctrl_ptr->config_ptr->apps_bps_low_threshold) &&
-            !ctrl_ptr->tick_ptr->brakelight_pwr && 
-            tx_time_get() > ctrl_ptr->apps_bps_fault_start + TX_TIMER_TICKS_PER_SECOND) {
-            return CTRL_STATE_TS_ON;
+            !ctrl_ptr->tick_ptr->brakelight_pwr)
+        {
+            if (tx_time_get() > ctrl_ptr->apps_bps_fault_start + TX_TIMER_TICKS_PER_SECOND) {
+                return CTRL_STATE_TS_ON;
+            }
+        }
+        else
+        {
+            ctrl_ptr->apps_bps_fault_start = tx_time_get();
         }
     }
 
-    ctrl_ptr->apps_bps_fault_start = tx_time_get();
-    return CTRL_STATE_APPS_SCS_FAULT;
+    return ctrl_ptr->state;
 }
 
 /**
