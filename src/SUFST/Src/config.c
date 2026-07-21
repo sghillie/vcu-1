@@ -212,7 +212,7 @@ static const config_t config_instance = {
     .wheelspeed = {
         .thread = {
             .name = "WHEELSPEED",
-            .priority = 15,
+            .priority = 14,
             .stack_size = 1024,
         },
         .ticks_per_wheel = 48,
