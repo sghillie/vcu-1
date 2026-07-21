@@ -43,6 +43,8 @@ static void tick_thread_entry(ULONG input)
         {
             tick_ptr->sagl_status
                 = scs_read(&tick_ptr->sagl, &tick_ptr->sagl_reading);
+            tick_ptr->current_status
+                = scs_read(&tick_ptr->current, &tick_ptr->current_reading);
             tick_ptr->mode_adc_status =
                 scs_read(&tick_ptr->mode_adc, &tick_ptr->mode_adc_reading);
         }
@@ -77,6 +79,7 @@ status_t tick_init(tick_context_t* tick_ptr,
     tick_ptr->bps_status = STATUS_ERROR;
     tick_ptr->apps_status = STATUS_ERROR;
     tick_ptr->sagl_status = STATUS_ERROR;
+    tick_ptr->current_status = STATUS_ERROR;
     tick_ptr->mode_adc_status = STATUS_ERROR;
     tick_ptr->ext_inputs_counter = 0;
 
@@ -110,6 +113,11 @@ status_t tick_init(tick_context_t* tick_ptr,
     if (status == STATUS_OK)
     {
         status = scs_create(&tick_ptr->sagl, &ext_inputs_config_ptr->sagl);
+    }
+
+    if (status == STATUS_OK)
+    {
+        status = scs_create(&tick_ptr->current, &ext_inputs_config_ptr->current);
     }
 
     if (status == STATUS_OK)
@@ -157,6 +165,7 @@ void tick_update_canbc_states(tick_context_t* tick_ptr)
         states->sensors_raw.vcu_apps1_raw = tick_ptr->apps.apps_1_signal.adc_reading;
         states->sensors_raw.vcu_apps2_raw = tick_ptr->apps.apps_2_signal.adc_reading;
         states->sensors_raw.vcu_bps_raw = tick_ptr->bps.signal.adc_reading;
+        states->sensors_raw.vcu_current_raw = tick_ptr->current.adc_reading;
         canbc_unlock_state(tick_ptr->canbc_ptr);
     }
 }
@@ -246,6 +255,24 @@ status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result)
     else
     {
         LOG_ERROR("SAGL locking error\n");
+    }
+
+    return status;
+}
+
+status_t tick_get_current_reading(tick_context_t* tick_ptr, uint16_t* result)
+{
+    status_t status = STATUS_ERROR;
+
+    if (lock_tick_sensors(tick_ptr, 100) == STATUS_OK)
+    {
+        *result = tick_ptr->current_reading;
+        status = tick_ptr->current_status;
+        unlock_tick_sensors(tick_ptr);
+    }
+    else
+    {
+        LOG_ERROR("Current locking error\n");
     }
 
     return status;

@@ -62,6 +62,7 @@ status_t ctrl_init(ctrl_context_t* ctrl_ptr,
     ctrl_ptr->apps_reading = 0;
     ctrl_ptr->bps_reading = 0;
     ctrl_ptr->sagl_reading = 0;
+    ctrl_ptr->current_reading = 0;
     ctrl_ptr->torque_request = 0;
     ctrl_ptr->shdn_reading = 0;
     ctrl_ptr->precharge_start = 0;
@@ -123,6 +124,7 @@ void ctrl_thread_entry(ULONG input)
         ctrl_ptr->shdn_reading = trc_ready();
 
         tick_get_sagl_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->sagl_reading);
+        tick_get_current_reading(ctrl_ptr->tick_ptr, &ctrl_ptr->current_reading);
 
         uint16_t mode_adc_reading;
         if (tick_get_mode_adc_reading(ctrl_ptr->tick_ptr, &mode_adc_reading) == STATUS_OK) {

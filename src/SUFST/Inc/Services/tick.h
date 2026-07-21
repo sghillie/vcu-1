@@ -25,11 +25,12 @@ typedef struct
     uint32_t bps_active_start;
     bool pump_pwr, fan_pwr;
     apps_context_t apps;
-    status_t bps_status, apps_status, sagl_status, mode_adc_status;
-    uint16_t bps_reading, apps_reading, sagl_reading, mode_adc_reading;
+    status_t bps_status, apps_status, sagl_status, mode_adc_status, current_status;
+    uint16_t bps_reading, apps_reading, sagl_reading, mode_adc_reading, current_reading;
     uint32_t ext_inputs_counter;
 
     scs_t sagl;
+    scs_t current;
     scs_t mode_adc;
 } tick_context_t;
 
@@ -44,6 +45,7 @@ status_t tick_init(tick_context_t* tick_ptr,
 status_t tick_get_bps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result);
+status_t tick_get_current_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_get_mode_adc_reading(tick_context_t* tick_ptr, uint16_t* result);
 status_t tick_clear_apps_scs_error(tick_context_t* tick_ptr);
 
