@@ -57,7 +57,7 @@ status_t canbc_init(canbc_context_t *canbc_h,
     // create state mutex
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_mutex_create(&canbc_h->state_mutex, NULL, 0);
+        tx_status = tx_mutex_create(&canbc_h->state_mutex, NULL, TX_INHERIT);
     }
 
     return (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
