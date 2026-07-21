@@ -17,8 +17,7 @@
 ###############################################################################
 
 TARGET = VCU
-BUILD_DIR = build
-DEBUG = 1
+DEBUG = 0
 C_STANDARD = c11
 
 # defines
@@ -818,9 +817,11 @@ ASM_INCLUDES =
 ifeq ($(DEBUG), 1)
 	C_DEFS = $(ALWAYS_C_DEFS) $(DEBUG_C_DEFS)
 	ASM_DEFS = $(DEBUG_ASM_DEFS)
+	BUILD_DIR = build/debug
 else
 	C_DEFS = $(ALWAYS_C_DEFS) $(RELEASE_C_DEFS)
 	ASM_DEFS = $(RELEASE_ASM_DEFS)
+	BUILD_DIR = build/release
 endif
 
 ###############################################################################
@@ -906,7 +907,7 @@ $(BUILD_DIR):
 # clean
 clean:
 	tput setaf 5; tput bold; echo "Cleaning build directory..."; tput sgr0
-	-rm -fR $(BUILD_DIR)
+	-rm -fR build
 	tput setaf 2; echo "Done"; tput sgr0
 
 # flash
