@@ -156,7 +156,7 @@ static const config_t config_instance = {
             .stack_size = 1024
         },
         .period = SECONDS_TO_TICKS(0.01),
-        .torque_limit = 2000,
+        .torque_limit = 2300,
         .power_limit = 10000,
         .broadcast_timeout_ticks = SECONDS_TO_TICKS(1)
     },
