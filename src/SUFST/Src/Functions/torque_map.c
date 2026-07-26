@@ -71,6 +71,17 @@ uint16_t torque_map_apply(torque_map_t* map_ptr, uint16_t input, int16_t speed)
 }
 
 /**
+ * @brief       Sets the torque ceiling for the active drive mode
+ *
+ * @param[in]   map_ptr     Torque map
+ * @param[in]   output_max  Torque ceiling for this mode (Nm * 10)
+ */
+void torque_map_set_output_max(torque_map_t* map_ptr, uint16_t output_max)
+{
+    map_ptr->output_max = output_max;
+}
+
+/**
  * @brief       Applies a deadzone to an input to ensure low input values
  *              result in zero torque
  *

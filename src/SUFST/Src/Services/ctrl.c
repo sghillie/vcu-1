@@ -339,7 +339,7 @@ static ctrl_state_t ctrl_proc_r2d_wait(ctrl_context_t* ctrl_ptr)
                 ctrl_ptr->pm100_ptr->reverse_mode_dangerous = false;
             }
 
-            ctrl_ptr->torque_map.output_max = torque_cap;
+            torque_map_set_output_max(&ctrl_ptr->torque_map, torque_cap);
             LOG_INFO("Torque cap (nm x10)%d\n", ctrl_ptr->torque_map.output_max);
 
             LOG_INFO("R2D active\n");
