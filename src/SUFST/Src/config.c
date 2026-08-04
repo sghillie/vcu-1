@@ -119,7 +119,7 @@ static const config_t config_instance = {
         .pin = R2D_SIREN_Pin
     },
     .torque_map = {
-        .function = TORQUE_MAP_LINEAR,
+        .function = TORQUE_MAP_EXPONENTIAL,
         .input_max = 1000, // percent * 10 so 100%
         .output_max = 1000, // initial default before R2D; torque_map_set_output_max() is called with .ctrl.{hard,endurance,crawl}_max_torque when entering R2D depending on the current mode
         .deadzone_fraction = 0.05f,

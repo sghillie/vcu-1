@@ -6,6 +6,7 @@
 static inline uint16_t apply_deadzone(torque_map_t* map_ptr, uint16_t input);
 static uint16_t null_torque_map(torque_map_t* map_ptr, uint16_t input);
 static uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input);
+static uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input);
 static inline uint16_t
 apply_speed_limit(torque_map_t* map_ptr, uint16_t input, int16_t speed);
 
@@ -39,6 +40,12 @@ status_t torque_map_init(torque_map_t* map_ptr,
     case TORQUE_MAP_LINEAR:
     {
         map_ptr->map_func = linear_torque_map;
+        break;
+    }
+
+    case TORQUE_MAP_EXPONENTIAL:
+    {
+        map_ptr->map_func = exponential_torque_map;
         break;
     }
 
@@ -125,12 +132,29 @@ uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input)
 
     const uint16_t torque = (uint16_t) (input * scale_factor);
 
-    if (input > map_ptr->config_ptr->input_max) 
+    if (input > map_ptr->config_ptr->input_max)
     {
         input = map_ptr->config_ptr->input_max;
     }
 
     return torque;
+}
+
+/**
+ * @brief   fraction^2 torque map
+ */
+uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input)
+{
+    if (input > map_ptr->config_ptr->input_max)
+    {
+        input = map_ptr->config_ptr->input_max;
+    }
+
+    const float fraction
+        = (float) input / (float) map_ptr->config_ptr->input_max;
+    const float shaped = fraction * fraction; // n = 2
+
+    return (uint16_t) (shaped * map_ptr->output_max);
 }
 
 uint16_t apply_speed_limit(torque_map_t* map_ptr, uint16_t input, int16_t speed)
