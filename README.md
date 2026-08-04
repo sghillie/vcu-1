@@ -20,10 +20,10 @@ SUFST Docs Site.
 
 ## Using the setup script
 
+Run the below command once to install dependencies, clone the repository and initialise submodules
+
 ```sh
-curl https://raw.githubusercontent.com/sufst/vcu/refs/heads/main/vcu-setup-script.sh -o vcu-setup-script.sh
-chmod +x vcu-setup-script.sh
-./vcu-setup-script.sh
+curl -LsSf https://raw.githubusercontent.com/sufst/vcu/refs/heads/main/vcu-setup-script.sh | bash
 ```
 
 ## Submodules
