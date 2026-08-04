@@ -398,9 +398,8 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t* ctrl_ptr)
             ctrl_ptr->apps_bps_start = tx_time_get();
         }
 
-        int16_t motor_speed = pm100_motor_speed(ctrl_ptr->pm100_ptr);
         ctrl_ptr->torque_request =
-            torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading, motor_speed);
+            torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading);
     } else {
         ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
     }

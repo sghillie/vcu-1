@@ -25,9 +25,6 @@ typedef struct _torque_map_t
     float deadzone_scale;                  // scale factor for inputs
     const config_torque_map_t* config_ptr; // configuration
     uint16_t output_max;
-    uint16_t speed_min;   // minimum Torque request at max speed (Nm *10)
-    uint16_t speed_start; // speed to start limiting torque (rpm)
-    uint16_t speed_end;   // speed for max torque limiting (rpm)
 } torque_map_t;
 
 /*
@@ -35,7 +32,7 @@ typedef struct _torque_map_t
  */
 status_t torque_map_init(torque_map_t* map_ptr,
                          const config_torque_map_t* config_ptr);
-uint16_t torque_map_apply(torque_map_t* map_ptr, uint16_t input, int16_t speed);
+uint16_t torque_map_apply(torque_map_t* map_ptr, uint16_t input);
 void torque_map_set_output_max(torque_map_t* map_ptr, uint16_t output_max);
 
 #endif

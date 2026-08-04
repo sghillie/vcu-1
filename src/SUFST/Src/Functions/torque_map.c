@@ -7,8 +7,6 @@ static inline uint16_t apply_deadzone(torque_map_t* map_ptr, uint16_t input);
 static uint16_t null_torque_map(torque_map_t* map_ptr, uint16_t input);
 static uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input);
 static uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input);
-static inline uint16_t
-apply_speed_limit(torque_map_t* map_ptr, uint16_t input, int16_t speed);
 
 /**
  * @brief       Initialises the torque map
@@ -56,9 +54,6 @@ status_t torque_map_init(torque_map_t* map_ptr,
     };
 
     map_ptr->output_max = config_ptr->output_max;
-    map_ptr->speed_min = config_ptr->speed_min;
-    map_ptr->speed_start = config_ptr->speed_start;
-    map_ptr->speed_end = config_ptr->speed_end;
 
     return status;
 }
@@ -69,12 +64,10 @@ status_t torque_map_init(torque_map_t* map_ptr,
  * @param[in]   map_ptr     Torque map
  * @param[in]   input       Input value
  */
-uint16_t torque_map_apply(torque_map_t* map_ptr, uint16_t input, int16_t speed)
+uint16_t torque_map_apply(torque_map_t* map_ptr, uint16_t input)
 {
     const uint16_t input_deadzone = apply_deadzone(map_ptr, input);
-    const uint16_t torque = map_ptr->map_func(map_ptr, input_deadzone);
-    const uint16_t limited_torque = apply_speed_limit(map_ptr, torque, speed);
-    return limited_torque;
+    return map_ptr->map_func(map_ptr, input_deadzone);
 }
 
 /**
@@ -155,43 +148,4 @@ uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input)
     const float shaped = fraction * fraction; // n = 2
 
     return (uint16_t) (shaped * map_ptr->output_max);
-}
-
-uint16_t apply_speed_limit(torque_map_t* map_ptr, uint16_t input, int16_t speed)
-{
-    uint16_t result = 0;
-    if (speed < map_ptr->speed_start)
-    {
-        result = input;
-    }
-    else if (speed > map_ptr->speed_end)
-    {
-        if (input < map_ptr->speed_min)
-        {
-            result = input;
-        }
-        else
-        {
-            result = map_ptr->speed_min;
-        }
-    }
-    else
-    {
-        uint16_t max_torque
-            = map_ptr->output_max
-              - (map_ptr->output_max - map_ptr->speed_min)
-                    * (speed - map_ptr->speed_start)
-                    / (map_ptr->speed_end - map_ptr->speed_start);
-
-        if (input < max_torque)
-        {
-            result = input;
-        }
-        else
-        {
-            result = max_torque;
-        }
-    }
-
-    return result;
 }
