@@ -1,5 +1,7 @@
 #include "torque_map.h"
 
+#include <math.h>
+
 /*
  * internal function prototypes
  */
@@ -134,7 +136,7 @@ uint16_t linear_torque_map(torque_map_t* map_ptr, uint16_t input)
 }
 
 /**
- * @brief   fraction^2 torque map
+ * @brief   (input/input_max)^exponent torque map
  */
 uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input)
 {
@@ -145,7 +147,7 @@ uint16_t exponential_torque_map(torque_map_t* map_ptr, uint16_t input)
 
     const float fraction
         = (float) input / (float) map_ptr->config_ptr->input_max;
-    const float shaped = fraction * fraction; // n = 2
+    const float shaped = powf(fraction, map_ptr->config_ptr->exponent);
 
     return (uint16_t) (shaped * map_ptr->output_max);
 }

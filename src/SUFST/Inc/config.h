@@ -120,6 +120,7 @@ typedef struct {
      uint16_t input_max;                     // maximum input value (range must be zero to max)
      uint16_t output_max;                    // maximum output value (Nm * 10)
      float deadzone_fraction;                // fraction of input range for deadzone
+     float exponent;                         // curve exponent for TORQUE_MAP_EXPONENTIAL (input/input_max)^exponent
 } config_torque_map_t;
 
 /**

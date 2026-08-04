@@ -122,7 +122,8 @@ static const config_t config_instance = {
         .function = TORQUE_MAP_EXPONENTIAL,
         .input_max = 1000, // percent * 10 so 100%
         .output_max = 1000, // initial default before R2D; torque_map_set_output_max() is called with .ctrl.{hard,endurance,crawl}_max_torque when entering R2D depending on the current mode
-        .deadzone_fraction = 0.05f
+        .deadzone_fraction = 0.05f,
+        .exponent = 2.5f
     },
     .pm100 = {
         .thread = {
