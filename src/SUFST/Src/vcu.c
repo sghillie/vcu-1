@@ -38,16 +38,14 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
     // heartbeat
     if (status == STATUS_OK)
     {
-        status = heartbeat_init(&vcu_ptr->heartbeat,
-                                app_mem_pool,
+        status = heartbeat_init(&vcu_ptr->heartbeat, app_mem_pool,
                                 &vcu_ptr->config_ptr->heartbeat);
     }
 
     // enter USB mass storage mode if requested
     if (status == STATUS_OK && usb_mass_storage_mode_button_held())
     {
-        return usb_msc_init(&vcu_ptr->usb_msc,
-                            app_mem_pool,
+        return usb_msc_init(&vcu_ptr->usb_msc, app_mem_pool,
                             &vcu_ptr->config_ptr->usb_msc);
     }
 
@@ -81,12 +79,12 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
         },
     };
 
-    rtcan_handle_t *rtcan_handles[] = {&vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t};
-    CAN_HandleTypeDef *can_handles[] = {can_s_h, can_t_h};
-    uint32_t rtcan_priorities[] = {vcu_ptr->config_ptr->rtos.rtcan_s_priority,
-                                   vcu_ptr->config_ptr->rtos.rtcan_t_priority};
-    const CAN_FilterTypeDef *rtcan_filters[] = {can_s_filters, can_t_filters};
-    uint32_t rtcan_filter_counts[] = {1U, 1U};
+    rtcan_handle_t *rtcan_handles[] = { &vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t };
+    CAN_HandleTypeDef *can_handles[] = { can_s_h, can_t_h };
+    uint32_t rtcan_priorities[] = { vcu_ptr->config_ptr->rtos.rtcan_s_priority,
+                                    vcu_ptr->config_ptr->rtos.rtcan_t_priority };
+    const CAN_FilterTypeDef *rtcan_filters[] = { can_s_filters, can_t_filters };
+    uint32_t rtcan_filter_counts[] = { 1U, 1U };
 
     for (uint32_t i = 0; i < 2; i++)
     {
@@ -102,9 +100,8 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
                 .filter_count = rtcan_filter_counts[i],
             };
 
-            rtcan_status_t rtcan_status = rtcan_init(rtcan_handles[i],
-                                                     can_handles[i],
-                                                     &rtcan_config);
+            rtcan_status_t rtcan_status =
+                rtcan_init(rtcan_handles[i], can_handles[i], &rtcan_config);
 
             if (rtcan_status == RTCAN_OK)
             {
@@ -127,94 +124,65 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
     // CAN broadcast service
     if (status == STATUS_OK)
     {
-        status = canbc_init(&vcu_ptr->canbc,
-                            &vcu_ptr->rtcan_t,
-                            &vcu_ptr->rtcan_s,
-                            app_mem_pool,
-                            &vcu_ptr->config_ptr->canbc);
+        status = canbc_init(&vcu_ptr->canbc, &vcu_ptr->rtcan_t, &vcu_ptr->rtcan_s,
+                            app_mem_pool, &vcu_ptr->config_ptr->canbc);
     }
 
     // dash
     if (status == STATUS_OK)
     {
-        status = dash_init(&vcu_ptr->dash,
-                           app_mem_pool,
-                           &vcu_ptr->config_ptr->dash);
+        status = dash_init(&vcu_ptr->dash, app_mem_pool, &vcu_ptr->config_ptr->dash);
     }
 
     // tick
     if (status == STATUS_OK)
     {
-        status = tick_init(&vcu_ptr->tick,
-                           &vcu_ptr->canbc,
-                           app_mem_pool,
-                           &vcu_ptr->config_ptr->tick,
-                           &vcu_ptr->config_ptr->apps,
-                           &vcu_ptr->config_ptr->bps,
-                           &vcu_ptr->config_ptr->ext_inputs);
+        status = tick_init(&vcu_ptr->tick, &vcu_ptr->canbc, app_mem_pool,
+                           &vcu_ptr->config_ptr->tick, &vcu_ptr->config_ptr->apps,
+                           &vcu_ptr->config_ptr->bps, &vcu_ptr->config_ptr->ext_inputs);
     }
 
     // pm100
     if (status == STATUS_OK)
     {
-        status = pm100_init(&vcu_ptr->pm100,
-                            app_mem_pool,
-                            &vcu_ptr->rtcan_t,
-                            &vcu_ptr->rtcan_s,
-                            &vcu_ptr->config_ptr->pm100);
+        status = pm100_init(&vcu_ptr->pm100, app_mem_pool, &vcu_ptr->rtcan_t,
+                            &vcu_ptr->rtcan_s, &vcu_ptr->config_ptr->pm100);
     }
 
     // control
     if (status == STATUS_OK)
     {
-        status = ctrl_init(&vcu_ptr->ctrl,
-                           &vcu_ptr->dash,
-                           &vcu_ptr->pm100,
-                           &vcu_ptr->tick,
-                           &vcu_ptr->remote_ctrl,
-                           &vcu_ptr->canbc,
-                           &vcu_ptr->fans,
-                           app_mem_pool,
-                           &vcu_ptr->config_ptr->ctrl,
-                           &vcu_ptr->config_ptr->rtds,
-                           &vcu_ptr->config_ptr->torque_map);
+        status = ctrl_init(&vcu_ptr->ctrl, &vcu_ptr->dash, &vcu_ptr->pm100,
+                           &vcu_ptr->tick, &vcu_ptr->remote_ctrl, &vcu_ptr->canbc,
+                           &vcu_ptr->fans, app_mem_pool, &vcu_ptr->config_ptr->ctrl,
+                           &vcu_ptr->config_ptr->rtds, &vcu_ptr->config_ptr->torque_map);
     }
 
     // remote control
     if (status == STATUS_OK)
     {
-        status = remote_ctrl_init(
-            &vcu_ptr->remote_ctrl,
-            &vcu_ptr->canbc,
-            app_mem_pool,
-            &vcu_ptr->rtcan_s,
-            &vcu_ptr->config_ptr->remote_ctrl);
+        status = remote_ctrl_init(&vcu_ptr->remote_ctrl, &vcu_ptr->canbc, app_mem_pool,
+                                  &vcu_ptr->rtcan_s, &vcu_ptr->config_ptr->remote_ctrl);
     }
 
     // wheelspeed
     if (status == STATUS_OK)
     {
-        status = wheelspeed_init(&vcu_ptr->wheelspeed,
-                                 &vcu_ptr->rtcan_s,
-                                 app_mem_pool,
-                                 &vcu_ptr->config_ptr->wheelspeed);
+        status = wheelspeed_init(&vcu_ptr->wheelspeed, &vcu_ptr->rtcan_s,
+                                 app_mem_pool, &vcu_ptr->config_ptr->wheelspeed);
     }
 
     // fans
     if (status == STATUS_OK)
     {
-        status = fans_init(&vcu_ptr->fans,
-                           &vcu_ptr->rtcan_s,
-                           app_mem_pool,
+        status = fans_init(&vcu_ptr->fans, &vcu_ptr->rtcan_s, app_mem_pool,
                            &vcu_ptr->config_ptr->fans);
     }
 
     // sd card
     if (status == STATUS_OK)
     {
-        status = sd_init(&vcu_ptr->sd,
-                         app_mem_pool,
-                         &vcu_ptr->config_ptr->sd);
+        status = sd_init(&vcu_ptr->sd, app_mem_pool, &vcu_ptr->config_ptr->sd);
     }
 
     if (status != STATUS_OK)
@@ -229,8 +197,7 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
  * @param[in]   vcu_ptr VCU instance
  * @param[in]   can_h   CAN handle from callback
  */
-status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr,
-                                            CAN_HandleTypeDef *can_h)
+status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 {
     // TODO: how to handle CAN C vs CAN S
     rtcan_status_t status = rtcan_handle_tx_mailbox_callback(&vcu_ptr->rtcan_t, can_h);
@@ -262,9 +229,7 @@ status_t vcu_handle_can_tx_mailbox_callback(vcu_context_t *vcu_ptr,
  * @param[in]   can_h       CAN handle
  * @param[in]   rx_fifo     Rx FIFO number
  */
-status_t vcu_handle_can_rx_it(vcu_context_t *vcu_ptr,
-                              CAN_HandleTypeDef *can_h,
-                              uint32_t rx_fifo)
+status_t vcu_handle_can_rx_it(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h, uint32_t rx_fifo)
 {
     rtcan_status_t status;
 
@@ -296,8 +261,7 @@ status_t vcu_handle_can_err(vcu_context_t *vcu_ptr, CAN_HandleTypeDef *can_h)
 {
     rtcan_status_t status;
 
-    LOG_ERROR("CAN error 0x%08lX on %s\n",
-              HAL_CAN_GetError(can_h),
+    LOG_ERROR("CAN error 0x%08lX on %s\n", HAL_CAN_GetError(can_h),
               (can_h == vcu_ptr->rtcan_t.hcan) ? "CAN_T" : "CAN_S");
 
     if (vcu_ptr->rtcan_t.hcan == can_h)

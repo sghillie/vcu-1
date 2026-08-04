@@ -10,7 +10,7 @@
  *
  * @param[in]   config_ptr  RTDS configuration
  */
-status_t rtds_activate(const config_rtds_t* config_ptr)
+status_t rtds_activate(const config_rtds_t *config_ptr)
 {
 
     // unlinke other outouts, the RTDS is active high.
@@ -30,8 +30,7 @@ status_t rtds_activate(const config_rtds_t* config_ptr)
  * @param[in]   pulse_ptr   RTDS pulse context
  * @param[in]   config_ptr  RTDS configuration
  */
-void rtds_pulse_init(rtds_pulse_context_t* pulse_ptr,
-                     const config_rtds_t* config_ptr)
+void rtds_pulse_init(rtds_pulse_context_t *pulse_ptr, const config_rtds_t *config_ptr)
 {
     pulse_ptr->config_ptr = config_ptr;
     pulse_ptr->active = false;
@@ -47,12 +46,14 @@ void rtds_pulse_init(rtds_pulse_context_t* pulse_ptr,
  * @param[in]   pulse_ptr   RTDS pulse context
  * @param[in]   enable      Whether the pulse should currently be running
  */
-void rtds_pulse_tick(rtds_pulse_context_t* pulse_ptr, bool enable)
+void rtds_pulse_tick(rtds_pulse_context_t *pulse_ptr, bool enable)
 {
-    const config_rtds_t* config_ptr = pulse_ptr->config_ptr;
+    const config_rtds_t *config_ptr = pulse_ptr->config_ptr;
 
-    if (!enable) {
-        if (pulse_ptr->pin_on) {
+    if (!enable)
+    {
+        if (pulse_ptr->pin_on)
+        {
             HAL_GPIO_WritePin(config_ptr->port, config_ptr->pin, GPIO_PIN_RESET);
             pulse_ptr->pin_on = false;
         }
@@ -60,7 +61,8 @@ void rtds_pulse_tick(rtds_pulse_context_t* pulse_ptr, bool enable)
         return;
     }
 
-    if (!pulse_ptr->active) {
+    if (!pulse_ptr->active)
+    {
         // rising edge: start the pulse immediately with the RTDS on
         pulse_ptr->active = true;
         pulse_ptr->pin_on = true;
@@ -69,10 +71,11 @@ void rtds_pulse_tick(rtds_pulse_context_t* pulse_ptr, bool enable)
         return;
     }
 
-    uint32_t phase_ticks = pulse_ptr->pin_on ? config_ptr->pulse_on_ticks
-                                             : config_ptr->pulse_off_ticks;
+    uint32_t phase_ticks = pulse_ptr->pin_on ? config_ptr->pulse_on_ticks :
+                                               config_ptr->pulse_off_ticks;
 
-    if (tx_time_get() >= pulse_ptr->phase_start + phase_ticks) {
+    if (tx_time_get() >= pulse_ptr->phase_start + phase_ticks)
+    {
         pulse_ptr->pin_on = !pulse_ptr->pin_on;
         HAL_GPIO_WritePin(config_ptr->port, config_ptr->pin,
                           pulse_ptr->pin_on ? GPIO_PIN_SET : GPIO_PIN_RESET);

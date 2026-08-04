@@ -13,15 +13,14 @@
 #include "status.h"
 #include "tx_api.h"
 
-typedef struct {
-    TX_THREAD    thread;
+typedef struct
+{
+    TX_THREAD thread;
     TX_BYTE_POOL *pool;
 } usb_msc_context_t;
 
 bool usb_mass_storage_mode_button_held(void);
-status_t usb_msc_init(usb_msc_context_t *ctx,
-                      TX_BYTE_POOL *pool,
-                      const config_usb_msc_t *config_ptr);
+status_t usb_msc_init(usb_msc_context_t *ctx, TX_BYTE_POOL *pool, const config_usb_msc_t *config_ptr);
 status_t enter_usb_mass_storage_mode(TX_BYTE_POOL *pool);
 
 #endif

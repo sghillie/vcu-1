@@ -1,7 +1,7 @@
 #include "sd_logging.h"
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "log.h"
 #include "main.h"
@@ -46,13 +46,10 @@ static UINT create_log_file(sd_context_t *sd)
     if (s != FX_SUCCESS && s != FX_ALREADY_CREATED)
         return s;
 
-    return fx_file_open(&sd->sd_media, &sd->log_file,
-                        sd->log_filename, FX_OPEN_FOR_WRITE);
+    return fx_file_open(&sd->sd_media, &sd->log_file, sd->log_filename, FX_OPEN_FOR_WRITE);
 }
 
-status_t sd_init(sd_context_t *sd,
-                 TX_BYTE_POOL *stack_pool_ptr,
-                 const config_sd_t *config_ptr)
+status_t sd_init(sd_context_t *sd, TX_BYTE_POOL *stack_pool_ptr, const config_sd_t *config_ptr)
 {
     sd->config_ptr = config_ptr;
 
@@ -72,37 +69,28 @@ status_t sd_init(sd_context_t *sd,
 
     void *stack_ptr = NULL;
     LOG_INFO("SD: allocate stack\n");
-    UINT tx_status = tx_byte_allocate(stack_pool_ptr,
-                                      &stack_ptr,
-                                      config_ptr->thread.stack_size,
-                                      TX_NO_WAIT);
+    UINT tx_status = tx_byte_allocate(stack_pool_ptr, &stack_ptr,
+                                      config_ptr->thread.stack_size, TX_NO_WAIT);
 
     if (tx_status == TX_SUCCESS)
     {
         LOG_INFO("SD: allocate queue\n");
-        tx_status = tx_queue_create(&sd->msg_queue,
-                                    NULL,
-                                    SD_LOG_MSG_SIZE_ULONG,
-                                    sd->msg_queue_mem,
-                                    sizeof(sd->msg_queue_mem));
+        tx_status = tx_queue_create(&sd->msg_queue, NULL, SD_LOG_MSG_SIZE_ULONG,
+                                    sd->msg_queue_mem, sizeof(sd->msg_queue_mem));
     }
 
     if (tx_status == TX_SUCCESS)
     {
         LOG_INFO("SD: allocate thread\n");
-        tx_status = tx_thread_create(&sd->thread,
-                                     (CHAR *)config_ptr->thread.name,
-                                     sd_thread_entry,
-                                     (ULONG)sd,
-                                     stack_ptr,
-                                     config_ptr->thread.stack_size,
-                                     config_ptr->thread.priority,
-                                     config_ptr->thread.priority,
-                                     TX_NO_TIME_SLICE,
-                                     TX_AUTO_START);
+        tx_status =
+            tx_thread_create(&sd->thread, (CHAR *)config_ptr->thread.name, sd_thread_entry,
+                             (ULONG)sd, stack_ptr, config_ptr->thread.stack_size,
+                             config_ptr->thread.priority, config_ptr->thread.priority,
+                             TX_NO_TIME_SLICE, TX_AUTO_START);
     }
 
-    if (tx_status != TX_SUCCESS) {
+    if (tx_status != TX_SUCCESS)
+    {
         LOG_ERROR("SD init failure\n");
         return STATUS_ERROR;
     }
@@ -131,12 +119,8 @@ static void sd_thread_entry(ULONG input)
 {
     sd_context_t *sd = (sd_context_t *)input;
 
-    UINT s = fx_media_open(&sd->sd_media,
-                           "SD",
-                           fx_stm32_sd_driver,
-                           NULL,
-                           sd->media_buffer,
-                           sizeof(sd->media_buffer));
+    UINT s = fx_media_open(&sd->sd_media, "SD", fx_stm32_sd_driver, NULL,
+                           sd->media_buffer, sizeof(sd->media_buffer));
 
     if (s != FX_SUCCESS)
     {

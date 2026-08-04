@@ -55,7 +55,7 @@ Language: Cpp
 Standard: Cpp11
 
 # Pointer and reference alignment style. Possible values: Left, Right, Middle.
-PointerAlignment: Left
+PointerAlignment: Right
 
 # AccessModifierOffset (int)
 # The extra indent or outdent of access modifiers, e.g. public:.
@@ -185,7 +185,7 @@ BreakBeforeBinaryOperators: false
 #   BS_GNU (in configuration: GNU) Always break before braces and add an extra level of indentation to braces of control statements, not to those of class, function or other definitions.
 #   BS_WebKit (in configuration: WebKit) Like Attach, but break before functions.
 #   BS_Custom (in configuration: Custom) Configure each individual brace in BraceWrapping.
-BreakBeforeBraces: Linux
+BreakBeforeBraces: Allman
 
 # BreakBeforeTernaryOperators (bool)
 # If true, ternary operators will be placed after line breaks.

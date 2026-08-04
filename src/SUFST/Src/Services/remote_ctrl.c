@@ -14,7 +14,8 @@ static void unlock_sim_sensors(remote_ctrl_context_t *remote_ctrl_ptr);
 void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr);
 
 #ifdef ENABLE_VCU_SIMULATION_MODE
-static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t *msg_ptr);
+static void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr,
+                              const rtcan_msg_t *msg_ptr);
 #endif
 
 status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
@@ -26,38 +27,31 @@ status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
     remote_ctrl_ptr->config_ptr = config_ptr;
     remote_ctrl_ptr->rtcan_s_ptr = rtcan_s_prt;
     remote_ctrl_ptr->canbc_ptr = canbc_ptr;
-    remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){0};
+    remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){ 0 };
 
     status_t status = STATUS_OK;
 
     // create service thread
     void *stack_ptr = NULL;
-    UINT tx_status = tx_byte_allocate(stack_pool_ptr,
-                                      &stack_ptr,
-                                      config_ptr->thread.stack_size,
-                                      TX_NO_WAIT);
+    UINT tx_status = tx_byte_allocate(stack_pool_ptr, &stack_ptr,
+                                      config_ptr->thread.stack_size, TX_NO_WAIT);
 
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_thread_create(&remote_ctrl_ptr->thread,
-                                     (CHAR *)config_ptr->thread.name,
-                                     remote_ctrl_thread_entry,
-                                     (ULONG)remote_ctrl_ptr,
-                                     stack_ptr,
-                                     config_ptr->thread.stack_size,
-                                     config_ptr->thread.priority,
-                                     config_ptr->thread.priority,
-                                     TX_NO_TIME_SLICE,
-                                     TX_AUTO_START);
+        tx_status =
+            tx_thread_create(&remote_ctrl_ptr->thread,
+                             (CHAR *)config_ptr->thread.name,
+                             remote_ctrl_thread_entry, (ULONG)remote_ctrl_ptr,
+                             stack_ptr, config_ptr->thread.stack_size,
+                             config_ptr->thread.priority, config_ptr->thread.priority,
+                             TX_NO_TIME_SLICE, TX_AUTO_START);
     }
 
     // create CAN receive queue
     if (tx_status == TX_SUCCESS)
     {
-        if (rtcan_os_queue_create(&remote_ctrl_ptr->can_rx_queue,
-                                  NULL,
-                                  sizeof(rtcan_msg_t*),
-                                  REMOTE_CTRL_RX_QUEUE_SIZE,
+        if (rtcan_os_queue_create(&remote_ctrl_ptr->can_rx_queue, NULL,
+                                  sizeof(rtcan_msg_t *), REMOTE_CTRL_RX_QUEUE_SIZE,
                                   remote_ctrl_ptr->can_rx_queue_mem,
                                   sizeof(remote_ctrl_ptr->can_rx_queue_mem)) != RTCAN_OS_OK)
         {
@@ -88,55 +82,54 @@ status_t remote_ctrl_init(remote_ctrl_context_t *remote_ctrl_ptr,
 static void remote_ctrl_thread_entry(ULONG input)
 {
 
-    #ifdef ENABLE_VCU_SIMULATION_MODE
-        remote_ctrl_context_t *remote_ctrl_ptr = (remote_ctrl_context_t *)input;
-            const config_remote_ctrl_t *config_ptr = remote_ctrl_ptr->config_ptr;
+#ifdef ENABLE_VCU_SIMULATION_MODE
+    remote_ctrl_context_t *remote_ctrl_ptr = (remote_ctrl_context_t *)input;
+    const config_remote_ctrl_t *config_ptr = remote_ctrl_ptr->config_ptr;
 
-            uint32_t rtcan_channel = CAN_S_VCU_SIMULATION_FRAME_ID;
+    uint32_t rtcan_channel = CAN_S_VCU_SIMULATION_FRAME_ID;
 
-            rtcan_status_t status = rtcan_subscribe(remote_ctrl_ptr->rtcan_s_ptr,
-                                                    rtcan_channel,
-                                                    remote_ctrl_ptr->can_rx_queue);
+    rtcan_status_t status = rtcan_subscribe(remote_ctrl_ptr->rtcan_s_ptr, rtcan_channel,
+                                            remote_ctrl_ptr->can_rx_queue);
 
-            if (status != RTCAN_OK)
+    if (status != RTCAN_OK)
+    {
+        LOG_ERROR("Failed to subscribe to the CAN_S_VCU_SIMULATION message");
+        tx_thread_terminate(&remote_ctrl_ptr->thread);
+    }
+
+    while (1)
+    {
+        rtcan_msg_t *msg_ptr = NULL;
+        rtcan_osal_status_t status =
+            rtcan_os_queue_receive(remote_ctrl_ptr->can_rx_queue, &msg_ptr,
+                                   config_ptr->broadcast_timeout_ticks);
+
+        if (status == RTCAN_OS_OK && msg_ptr != NULL)
+        {
+            if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
             {
-                LOG_ERROR( "Failed to subscribe to the CAN_S_VCU_SIMULATION message");
-                tx_thread_terminate(&remote_ctrl_ptr->thread);
+                process_broadcast(remote_ctrl_ptr, msg_ptr);
+                rtcan_msg_consumed(remote_ctrl_ptr->rtcan_s_ptr, msg_ptr);
+                unlock_sim_sensors(remote_ctrl_ptr);
             }
-
-            while (1)
+            else
             {
-                rtcan_msg_t *msg_ptr = NULL;
-                rtcan_osal_status_t status = rtcan_os_queue_receive(remote_ctrl_ptr->can_rx_queue,
-                                                                    &msg_ptr,
-                                                                    config_ptr->broadcast_timeout_ticks);
-
-                if (status == RTCAN_OS_OK && msg_ptr != NULL)
-                {
-                    if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
-                    {
-                        process_broadcast(remote_ctrl_ptr, msg_ptr);
-                        rtcan_msg_consumed(remote_ctrl_ptr->rtcan_s_ptr, msg_ptr);
-                        unlock_sim_sensors(remote_ctrl_ptr);
-                    }
-                    else
-                    {
-                        LOG_ERROR( "Error locking sensors\n");
-                    }
-                }
-                else if (status == RTCAN_OS_TIMEOUT)
-                {
-                    LOG_ERROR("Broadcast timeout\n");
-                    reset_remote_ctrl_requests(remote_ctrl_ptr);
-                }
-                else
-                {
-                    LOG_ERROR("Broadcast Error: %d\n", status);
-                    reset_remote_ctrl_requests(remote_ctrl_ptr);
-                }
-                tx_thread_sleep(config_ptr->period);
+                LOG_ERROR("Error locking sensors\n");
             }
-    #endif
+        }
+        else if (status == RTCAN_OS_TIMEOUT)
+        {
+            LOG_ERROR("Broadcast timeout\n");
+            reset_remote_ctrl_requests(remote_ctrl_ptr);
+        }
+        else
+        {
+            LOG_ERROR("Broadcast Error: %d\n", status);
+            reset_remote_ctrl_requests(remote_ctrl_ptr);
+        }
+        tx_thread_sleep(config_ptr->period);
+    }
+#endif
 }
 
 static status_t lock_sim_sensors(remote_ctrl_context_t *remote_ctrl_ptr, uint32_t timeout)
@@ -226,13 +219,11 @@ void process_broadcast(remote_ctrl_context_t *remote_ctrl_ptr, const rtcan_msg_t
     {
     case CAN_S_VCU_SIMULATION_FRAME_ID:
     {
-        can_s_vcu_simulation_unpack(&remote_ctrl_ptr->requests,
-                                    msg_ptr->data,
+        can_s_vcu_simulation_unpack(&remote_ctrl_ptr->requests, msg_ptr->data,
                                     msg_ptr->length);
         break;
     }
-    default:
-        break;
+    default: break;
     }
 }
 
@@ -240,7 +231,7 @@ void reset_remote_ctrl_requests(remote_ctrl_context_t *remote_ctrl_ptr)
 {
     if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
     {
-        remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){0};
+        remote_ctrl_ptr->requests = (struct can_s_vcu_simulation_t){ 0 };
         remote_ctrl_ptr->ts_on_prev = false;
         remote_ctrl_ptr->r2d_prev = false;
         unlock_sim_sensors(remote_ctrl_ptr);

@@ -15,9 +15,9 @@ typedef struct
 {
     TX_THREAD thread;
     TX_MUTEX sensor_mutex;
-    const config_tick_t* config_ptr;
-    const config_ext_inputs_t* ext_inputs_config_ptr;
-    canbc_context_t* canbc_ptr;
+    const config_tick_t *config_ptr;
+    const config_ext_inputs_t *ext_inputs_config_ptr;
+    canbc_context_t *canbc_ptr;
 
     bps_context_t bps;
     bool brakelight_pwr;
@@ -34,19 +34,19 @@ typedef struct
     scs_t mode_adc;
 } tick_context_t;
 
-status_t tick_init(tick_context_t* tick_ptr,
-                   canbc_context_t* canbc_ptr,
-                   TX_BYTE_POOL* stack_pool_ptr,
-                   const config_tick_t* config_ptr,
-                   const config_apps_t* apps_config_ptr,
-                   const config_bps_t* bps_config_ptr,
-                   const config_ext_inputs_t* ext_inputs_config_ptr);
+status_t tick_init(tick_context_t *tick_ptr,
+                   canbc_context_t *canbc_ptr,
+                   TX_BYTE_POOL *stack_pool_ptr,
+                   const config_tick_t *config_ptr,
+                   const config_apps_t *apps_config_ptr,
+                   const config_bps_t *bps_config_ptr,
+                   const config_ext_inputs_t *ext_inputs_config_ptr);
 
-status_t tick_get_bps_reading(tick_context_t* tick_ptr, uint16_t* result);
-status_t tick_get_apps_reading(tick_context_t* tick_ptr, uint16_t* result);
-status_t tick_get_sagl_reading(tick_context_t* tick_ptr, uint16_t* result);
-status_t tick_get_current_reading(tick_context_t* tick_ptr, uint16_t* result);
-status_t tick_get_mode_adc_reading(tick_context_t* tick_ptr, uint16_t* result);
-status_t tick_clear_apps_scs_error(tick_context_t* tick_ptr);
+status_t tick_get_bps_reading(tick_context_t *tick_ptr, uint16_t *result);
+status_t tick_get_apps_reading(tick_context_t *tick_ptr, uint16_t *result);
+status_t tick_get_sagl_reading(tick_context_t *tick_ptr, uint16_t *result);
+status_t tick_get_current_reading(tick_context_t *tick_ptr, uint16_t *result);
+status_t tick_get_mode_adc_reading(tick_context_t *tick_ptr, uint16_t *result);
+status_t tick_clear_apps_scs_error(tick_context_t *tick_ptr);
 
 #endif /* TICK_H */

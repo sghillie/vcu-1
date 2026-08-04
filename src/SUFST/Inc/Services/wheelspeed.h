@@ -2,7 +2,7 @@
  * @file    wheelspeed.h
  * @author  Martin Perreau (@maartin0)
  * @brief   Wheelspeed interrupt reader for 4 wheels
- * @details Computes wheelspeeds on the fly for 4 wheelspeed sensors, 
+ * @details Computes wheelspeeds on the fly for 4 wheelspeed sensors,
             needs to handle ~4000 interrupts/second
             and broadcasts results in both RPM and m/s over CAN-S
  *****************************************************************************/
@@ -10,9 +10,9 @@
 #ifndef WHEELSPEED_H
 #define WHEELSPEED_H
 
+#include <rtcan.h>
 #include <stdint.h>
 #include <tx_api.h>
-#include <rtcan.h>
 
 #include "config.h"
 #include "status.h"

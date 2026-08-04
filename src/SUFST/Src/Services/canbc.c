@@ -35,23 +35,16 @@ status_t canbc_init(canbc_context_t *canbc_h,
 
     // create service thread
     void *stack_ptr = NULL;
-    UINT tx_status = tx_byte_allocate(stack_pool_ptr,
-                                      &stack_ptr,
-                                      config_ptr->thread.stack_size,
-                                      TX_NO_WAIT);
+    UINT tx_status = tx_byte_allocate(stack_pool_ptr, &stack_ptr,
+                                      config_ptr->thread.stack_size, TX_NO_WAIT);
 
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_thread_create(&canbc_h->thread,
-                                     (CHAR *)config_ptr->thread.name,
-                                     canbc_thread_entry,
-                                     (ULONG)canbc_h,
-                                     stack_ptr,
-                                     config_ptr->thread.stack_size,
-                                     config_ptr->thread.priority,
-                                     config_ptr->thread.priority,
-                                     TX_NO_TIME_SLICE,
-                                     TX_AUTO_START);
+        tx_status =
+            tx_thread_create(&canbc_h->thread, (CHAR *)config_ptr->thread.name,
+                             canbc_thread_entry, (ULONG)canbc_h, stack_ptr,
+                             config_ptr->thread.stack_size, config_ptr->thread.priority,
+                             config_ptr->thread.priority, TX_NO_TIME_SLICE, TX_AUTO_START);
     }
 
     // create state mutex
@@ -113,7 +106,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_T_VCU_STATE_FRAME_ID,
                                 .length = CAN_T_VCU_STATE_LENGTH,
-                                .extended = CAN_T_VCU_STATE_IS_EXTENDED};
+                                .extended = CAN_T_VCU_STATE_IS_EXTENDED };
 
         can_t_vcu_state_pack(message.data, &snapshot.state, message.length);
         if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
@@ -127,7 +120,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_S_VCU_SENSORS_FRAME_ID,
                                 .length = CAN_S_VCU_SENSORS_LENGTH,
-                                .extended = CAN_S_VCU_SENSORS_IS_EXTENDED};
+                                .extended = CAN_S_VCU_SENSORS_IS_EXTENDED };
 
         can_s_vcu_sensors_pack(message.data, &snapshot.sensors, message.length);
         if (rtcan_transmit(canbc_h->rtcan_s_h, &message) != RTCAN_OK)
@@ -141,7 +134,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_S_VCU_TEMPS_FRAME_ID,
                                 .length = CAN_S_VCU_TEMPS_LENGTH,
-                                .extended = CAN_S_VCU_TEMPS_IS_EXTENDED};
+                                .extended = CAN_S_VCU_TEMPS_IS_EXTENDED };
 
         can_s_vcu_temps_pack(message.data, &snapshot.temps, message.length);
         if (rtcan_transmit(canbc_h->rtcan_s_h, &message) != RTCAN_OK)
@@ -155,7 +148,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_T_VCU_ERROR_FRAME_ID,
                                 .length = CAN_T_VCU_ERROR_LENGTH,
-                                .extended = CAN_T_VCU_ERROR_IS_EXTENDED};
+                                .extended = CAN_T_VCU_ERROR_IS_EXTENDED };
 
         snapshot.errors.vcu_rtcan1_error = canbc_h->rtcan1_error;
         snapshot.errors.vcu_rtcan2_error = canbc_h->rtcan2_error;
@@ -173,7 +166,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_T_VCU_PDM_FRAME_ID,
                                 .length = CAN_T_VCU_PDM_LENGTH,
-                                .extended = CAN_T_VCU_PDM_IS_EXTENDED};
+                                .extended = CAN_T_VCU_PDM_IS_EXTENDED };
 
         can_t_vcu_pdm_pack(message.data, &snapshot.pdm, message.length);
         if (rtcan_transmit(canbc_h->rtcan_t_h, &message) != RTCAN_OK)
@@ -187,7 +180,7 @@ static void send_bc_messages(canbc_context_t *canbc_h)
     {
         rtcan_msg_t message = { .identifier = CAN_S_VCU_SENSORS_RAW_FRAME_ID,
                                 .length = CAN_S_VCU_SENSORS_RAW_LENGTH,
-                                .extended = CAN_S_VCU_SENSORS_RAW_IS_EXTENDED};
+                                .extended = CAN_S_VCU_SENSORS_RAW_IS_EXTENDED };
 
         can_s_vcu_sensors_raw_pack(message.data, &snapshot.sensors_raw, message.length);
         if (rtcan_transmit(canbc_h->rtcan_s_h, &message) != RTCAN_OK)

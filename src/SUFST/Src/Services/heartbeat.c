@@ -27,23 +27,16 @@ status_t heartbeat_init(heartbeat_context_t *heartbeat_h,
 
     // create service thread
     void *stack_ptr = NULL;
-    UINT tx_status = tx_byte_allocate(stack_pool_ptr,
-                                      &stack_ptr,
-                                      config_ptr->thread.stack_size,
-                                      TX_NO_WAIT);
+    UINT tx_status = tx_byte_allocate(stack_pool_ptr, &stack_ptr,
+                                      config_ptr->thread.stack_size, TX_NO_WAIT);
 
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_thread_create(&heartbeat_h->thread,
-                                     (CHAR *)config_ptr->thread.name,
-                                     heartbeat_thread_entry,
-                                     (ULONG)heartbeat_h,
-                                     stack_ptr,
-                                     config_ptr->thread.stack_size,
-                                     config_ptr->thread.priority,
-                                     config_ptr->thread.priority,
-                                     TX_NO_TIME_SLICE,
-                                     TX_AUTO_START);
+        tx_status =
+            tx_thread_create(&heartbeat_h->thread, (CHAR *)config_ptr->thread.name,
+                             heartbeat_thread_entry, (ULONG)heartbeat_h, stack_ptr,
+                             config_ptr->thread.stack_size, config_ptr->thread.priority,
+                             config_ptr->thread.priority, TX_NO_TIME_SLICE, TX_AUTO_START);
     }
 
     if (tx_status != TX_SUCCESS)
@@ -77,9 +70,9 @@ static void heartbeat_thread_entry(ULONG input)
     {
         VCU_Output_Toggle(ROB_LED_GPIO_Port, ROB_LED_Pin);
 
-        ULONG period = heartbeat_h->fast_mode
-            ? heartbeat_h->config_ptr->fast_blink_period_ticks
-            : heartbeat_h->config_ptr->blink_period_ticks;
+        ULONG period = heartbeat_h->fast_mode ?
+            heartbeat_h->config_ptr->fast_blink_period_ticks :
+            heartbeat_h->config_ptr->blink_period_ticks;
         tx_thread_sleep(period);
     }
 }

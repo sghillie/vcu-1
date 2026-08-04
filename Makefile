@@ -921,6 +921,13 @@ ccd:
 	${PYTHON} -m ccdgen --extensions .c .s .S --compiler arm-none-eabi-gcc -- ${MAKE}
 	tput sgr0; tput setaf 2; echo "Done"; tput sgr0
 
+# format source code
+.PHONY: format
+format:
+	tput setaf 5; tput bold; echo "Formatting source code..."; tput sgr0
+	find src/SUFST/Src src/SUFST/Inc \( -iname '*.c' -o -iname '*.h' \) -print0 | xargs -0 clang-format -i
+	tput setaf 2; echo "Done"; tput sgr0
+
 ###############################################################################
 # dependencies
 ###############################################################################

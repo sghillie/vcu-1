@@ -4,7 +4,7 @@ set -ex
 
 echo "Installing dependencies"
 sudo apt-get update
-sudo apt-get install -y gcc-arm-none-eabi stlink-tools python3-pip
+sudo apt-get install -y gcc-arm-none-eabi stlink-tools python3-pip clang-format
 
 # If repo already got cloned then skip
 if ! [ -f vcu-setup-script.sh ]; then

@@ -14,10 +14,8 @@
  * internal function prototypes
  */
 static uint16_t map_adc_reading(scs_t *scs_ptr);
-static scs_status_t validate(uint16_t adc_reading,
-                             uint16_t max_adc_reading,
-                             uint16_t min_adc_reading,
-                             uint32_t max_diff);
+static scs_status_t
+validate(uint16_t adc_reading, uint16_t max_adc_reading, uint16_t min_adc_reading, uint32_t max_diff);
 
 /**
  * @brief       Create new safety critical signal
@@ -39,9 +37,8 @@ status_t scs_create(scs_t *scs_ptr, const config_scs_t *config_ptr)
 
     // pre-compute the scale factors and validation constants
     scs_ptr->scale_up = (adc_range < mapped_range);
-    scs_ptr->scale_factor = scs_ptr->scale_up
-                                ? ((float)mapped_range / adc_range)
-                                : ((float)adc_range / mapped_range);
+    scs_ptr->scale_factor = scs_ptr->scale_up ? ((float)mapped_range / adc_range) :
+                                                ((float)adc_range / mapped_range);
     scs_ptr->max_bounds_diff = adc_range * config_ptr->outside_bounds_fraction;
 
     return STATUS_OK;
@@ -63,25 +60,20 @@ status_t scs_read(scs_t *scs_ptr, uint16_t *reading_ptr)
 {
 
     ADC_HandleTypeDef *hadc = scs_ptr->config_ptr->hadc;
-    ADC_ChannelConfTypeDef ch = {
-        .Channel = scs_ptr->config_ptr->adc_channel,
-        .Rank = ADC_REGULAR_RANK_1,
-        .SamplingTime = ADC_SAMPLETIME_144CYCLES
-    };
+    ADC_ChannelConfTypeDef ch = { .Channel = scs_ptr->config_ptr->adc_channel,
+                                  .Rank = ADC_REGULAR_RANK_1,
+                                  .SamplingTime = ADC_SAMPLETIME_144CYCLES };
 
     // configure port -> then read from the ADC and validate
-    if ((HAL_ADC_ConfigChannel(hadc, &ch) == HAL_OK) 
-        && (HAL_ADC_Start(hadc) == HAL_OK) 
-        && (HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY) == HAL_OK))
+    if ((HAL_ADC_ConfigChannel(hadc, &ch) == HAL_OK) && (HAL_ADC_Start(hadc) == HAL_OK) &&
+        (HAL_ADC_PollForConversion(hadc, HAL_MAX_DELAY) == HAL_OK))
     {
         scs_ptr->adc_reading = HAL_ADC_GetValue(hadc);
-        scs_ptr->status_verbose = validate(scs_ptr->adc_reading,
-                                           scs_ptr->config_ptr->max_adc,
-                                           scs_ptr->config_ptr->min_adc,
-                                           scs_ptr->max_bounds_diff);
-        scs_ptr->is_valid
-            = scs_ptr->status_verbose == STATUS_THRESHOLD_OK
-              || scs_ptr->status_verbose == STATUS_THRESHOLD_WARNING;
+        scs_ptr->status_verbose =
+            validate(scs_ptr->adc_reading, scs_ptr->config_ptr->max_adc,
+                     scs_ptr->config_ptr->min_adc, scs_ptr->max_bounds_diff);
+        scs_ptr->is_valid = scs_ptr->status_verbose == STATUS_THRESHOLD_OK ||
+            scs_ptr->status_verbose == STATUS_THRESHOLD_WARNING;
 
         if (scs_ptr->is_valid)
         {
@@ -125,19 +117,17 @@ uint16_t get_adc(scs_t *scs_ptr)
  */
 uint16_t map_adc_reading(scs_t *scs_ptr)
 {
-    uint16_t clipped = clip_to_range(scs_ptr->adc_reading,
-                                     scs_ptr->config_ptr->min_adc,
+    uint16_t clipped = clip_to_range(scs_ptr->adc_reading, scs_ptr->config_ptr->min_adc,
                                      scs_ptr->config_ptr->max_adc);
 
     uint16_t shifted = clipped - scs_ptr->config_ptr->min_adc;
 
-    uint16_t scaled = (scs_ptr->scale_up) ? shifted * scs_ptr->scale_factor
-                                          : shifted / scs_ptr->scale_factor;
+    uint16_t scaled = (scs_ptr->scale_up) ? shifted * scs_ptr->scale_factor :
+                                            shifted / scs_ptr->scale_factor;
 
     uint16_t mapped = scaled + scs_ptr->config_ptr->min_mapped;
 
-    return clip_to_range(mapped,
-                         scs_ptr->config_ptr->min_mapped,
+    return clip_to_range(mapped, scs_ptr->config_ptr->min_mapped,
                          scs_ptr->config_ptr->max_mapped);
 }
 
@@ -171,10 +161,8 @@ uint16_t map_adc_reading(scs_t *scs_ptr)
  * @return      true                The signal is valid
  * @return      false               The signal is invalid
  */
-scs_status_t validate(uint16_t adc_reading,
-                      uint16_t max_adc_reading,
-                      uint16_t min_adc_reading,
-                      uint32_t max_diff)
+scs_status_t
+validate(uint16_t adc_reading, uint16_t max_adc_reading, uint16_t min_adc_reading, uint32_t max_diff)
 {
     scs_status_t status = STATUS_THRESHOLD_ERROR;
     uint16_t low_diff = 0;

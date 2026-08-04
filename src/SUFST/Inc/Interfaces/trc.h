@@ -8,8 +8,8 @@
 #define TRC_H
 
 #include "gpio.h"
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "status.h"
 

@@ -1,6 +1,6 @@
 #include "apps.h"
 
-static const char* scs_label(status_t status, scs_status_t verbose)
+static const char *scs_label(status_t status, scs_status_t verbose)
 {
     if (status != STATUS_OK)
         return verbose == STATUS_THRESHOLD_ERROR ? "TERR" : "ERR";
@@ -13,7 +13,7 @@ static const char* scs_label(status_t status, scs_status_t verbose)
  * @param[in]   apps_ptr    APPS context
  */
 
-status_t apps_init(apps_context_t* apps_ptr, const config_apps_t* config_ptr)
+status_t apps_init(apps_context_t *apps_ptr, const config_apps_t *config_ptr)
 {
     apps_ptr->config_ptr = config_ptr;
     apps_ptr->scs_error = SCS_ERROR_NONE;
@@ -85,23 +85,23 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     }
 
     // check for discrepancy
-    uint16_t diff = (reading_1 > reading_2) ? (reading_1 - reading_2)
-                                            : (reading_2 - reading_1);
+    uint16_t diff = (reading_1 > reading_2) ? (reading_1 - reading_2) :
+                                              (reading_2 - reading_1);
 
     if (diff > apps_ptr->config_ptr->max_discrepancy)
     {
         status = STATUS_ERROR;
         scs_error |= SCS_ERROR_APPS_DISCREPANCY;
-        
-        LOG_WARN("APPS A1:%d[%s] A2:%d[%s] diff:%d[!]\n",
-                reading_1, scs_label(status_1, status_1_verbose),
-                reading_2, scs_label(status_2, status_2_verbose),
-                diff);
-    } else {
-        LOG_DEBUG("APPS A1:%d[%s] A2:%d[%s] diff:%d\n",
-                reading_1, scs_label(status_1, status_1_verbose),
-                reading_2, scs_label(status_2, status_2_verbose),
-                diff);
+
+        LOG_WARN("APPS A1:%d[%s] A2:%d[%s] diff:%d[!]\n", reading_1,
+                 scs_label(status_1, status_1_verbose), reading_2,
+                 scs_label(status_2, status_2_verbose), diff);
+    }
+    else
+    {
+        LOG_DEBUG("APPS A1:%d[%s] A2:%d[%s] diff:%d\n", reading_1,
+                  scs_label(status_1, status_1_verbose), reading_2,
+                  scs_label(status_2, status_2_verbose), diff);
     }
 
     // return reading

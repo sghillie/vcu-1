@@ -1,8 +1,8 @@
 #include "wheelspeed.h"
 
-#include <can_s.h>
-#include "main.h"
 #include "log.h"
+#include "main.h"
+#include <can_s.h>
 
 static void wheelspeed_thread_entry(ULONG input);
 static void wheelspeed_timer_callback(ULONG input);
@@ -18,41 +18,30 @@ status_t wheelspeed_init(wheelspeed_context_t *wh,
     wh->rtcan_h = rtcan_h;
 
     void *stack_ptr = NULL;
-    UINT tx_status = tx_byte_allocate(stack_pool_ptr,
-                                      &stack_ptr,
-                                      config_ptr->thread.stack_size,
-                                      TX_NO_WAIT);
+    UINT tx_status = tx_byte_allocate(stack_pool_ptr, &stack_ptr,
+                                      config_ptr->thread.stack_size, TX_NO_WAIT);
 
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_semaphore_create(&wh->sample_semaphore,
-                                        (CHAR *)"wheelspeed_sem",
-                                        0);
-    }
-    
-    if (tx_status == TX_SUCCESS)
-    {
-        tx_status = tx_timer_create(&wh->sample_timer,
-                                    (CHAR *)"wheelspeed_timer",
-                                    wheelspeed_timer_callback,
-                                    (ULONG)wh,
-                                    config_ptr->sample_period_ticks,
-                                    config_ptr->sample_period_ticks,
-                                    TX_AUTO_ACTIVATE);
+        tx_status =
+            tx_semaphore_create(&wh->sample_semaphore, (CHAR *)"wheelspeed_sem", 0);
     }
 
     if (tx_status == TX_SUCCESS)
     {
-        tx_status = tx_thread_create(&wh->thread,
-                                     (CHAR *)config_ptr->thread.name,
-                                     wheelspeed_thread_entry,
-                                     (ULONG)wh,
-                                     stack_ptr,
-                                     config_ptr->thread.stack_size,
-                                     config_ptr->thread.priority,
-                                     config_ptr->thread.priority,
-                                     TX_NO_TIME_SLICE,
-                                     TX_AUTO_START);
+        tx_status = tx_timer_create(&wh->sample_timer, (CHAR *)"wheelspeed_timer",
+                                    wheelspeed_timer_callback, (ULONG)wh,
+                                    config_ptr->sample_period_ticks,
+                                    config_ptr->sample_period_ticks, TX_AUTO_ACTIVATE);
+    }
+
+    if (tx_status == TX_SUCCESS)
+    {
+        tx_status =
+            tx_thread_create(&wh->thread, (CHAR *)config_ptr->thread.name,
+                             wheelspeed_thread_entry, (ULONG)wh, stack_ptr,
+                             config_ptr->thread.stack_size, config_ptr->thread.priority,
+                             config_ptr->thread.priority, TX_NO_TIME_SLICE, TX_AUTO_START);
     }
 
     return (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
@@ -81,9 +70,8 @@ static float compute_wheel_rpm(wheel_state_t *wheel, const config_wheelspeed_t *
     uint32_t delta = current - wheel->prev_count;
     wheel->prev_count = current;
 
-    float revs_per_second = (float)delta * TX_TIMER_TICKS_PER_SECOND
-                             / ((float)config->ticks_per_wheel
-                                * (float)config->sample_period_ticks);
+    float revs_per_second = (float)delta * TX_TIMER_TICKS_PER_SECOND /
+        ((float)config->ticks_per_wheel * (float)config->sample_period_ticks);
     return revs_per_second * 60.0;
 }
 
@@ -115,10 +103,14 @@ static void compute_and_broadcast(wheelspeed_context_t *wh)
 
     {
         struct can_s_wheel_speeds_t data = {
-            .wheel_fr_speed = can_s_wheel_speeds_wheel_fr_speed_encode(rpm_fr / 60.0 * cfg->wheel_circumference_meters),
-            .wheel_fl_speed = can_s_wheel_speeds_wheel_fl_speed_encode(rpm_fl / 60.0 * cfg->wheel_circumference_meters),
-            .wheel_rr_speed = can_s_wheel_speeds_wheel_rr_speed_encode(rpm_rr / 60.0 * cfg->wheel_circumference_meters),
-            .wheel_rl_speed = can_s_wheel_speeds_wheel_rl_speed_encode(rpm_rl / 60.0 * cfg->wheel_circumference_meters),
+            .wheel_fr_speed = can_s_wheel_speeds_wheel_fr_speed_encode(
+                rpm_fr / 60.0 * cfg->wheel_circumference_meters),
+            .wheel_fl_speed = can_s_wheel_speeds_wheel_fl_speed_encode(
+                rpm_fl / 60.0 * cfg->wheel_circumference_meters),
+            .wheel_rr_speed = can_s_wheel_speeds_wheel_rr_speed_encode(
+                rpm_rr / 60.0 * cfg->wheel_circumference_meters),
+            .wheel_rl_speed = can_s_wheel_speeds_wheel_rl_speed_encode(
+                rpm_rl / 60.0 * cfg->wheel_circumference_meters),
         };
         rtcan_msg_t msg = {
             .identifier = CAN_S_WHEEL_SPEEDS_FRAME_ID,

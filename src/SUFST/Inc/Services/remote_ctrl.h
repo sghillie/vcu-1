@@ -8,16 +8,16 @@
 #ifndef REMOTE_CTRL_H
 #define REMOTE_CTRL_H
 
-#include <stdint.h>
-#include <tx_api.h>
 #include <can_s.h>
 #include <can_t.h>
 #include <rtcan.h>
+#include <stdint.h>
+#include <tx_api.h>
 
+#include "canbc.h"
 #include "config.h"
 #include "log.h"
 #include "status.h"
-#include "canbc.h"
 
 #define REMOTE_CTRL_RX_QUEUE_SIZE 2 // 2 items (8 bytes)
 
@@ -29,7 +29,7 @@ typedef struct
     canbc_context_t *canbc_ptr;
     rtcan_handle_t *rtcan_s_ptr;
     rtcan_queue_t can_rx_queue;
-    uint32_t can_rx_queue_mem[RTCAN_OS_QUEUE_MEM_SIZE(REMOTE_CTRL_RX_QUEUE_SIZE, sizeof(rtcan_msg_t*)) / sizeof(uint32_t)];
+    uint32_t can_rx_queue_mem[RTCAN_OS_QUEUE_MEM_SIZE(REMOTE_CTRL_RX_QUEUE_SIZE, sizeof(rtcan_msg_t *)) / sizeof(uint32_t)];
 
     struct can_s_vcu_simulation_t requests;
     bool ts_on_prev;

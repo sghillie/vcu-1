@@ -2,17 +2,17 @@
 
 /**
  * @brief   Convert seconds to ticks
- * 
+ *
  * @note    The maximum precision is determined by how many ticks there are per
  *          second. E.g. TX_TIMER_TICKS_PER_SECOND = 1000 gives down to 0.001s.
  *          Antyhing less than this rounds down to zero ticks.
  */
-#define SECONDS_TO_TICKS(x)  (TX_TIMER_TICKS_PER_SECOND * x)
+#define SECONDS_TO_TICKS(x) (TX_TIMER_TICKS_PER_SECOND * x)
 
 /**
  * @brief   VCU configuration instance
- * 
-* @details See definitions of parameters in config.h
+ *
+ * @details See definitions of parameters in config.h
  *
  * @note    This struct is const, i.e. read only! The config should not change
  *          at runtime.
@@ -269,7 +269,7 @@ static const config_t config_instance = {
 /**
  * @brief   Returns the VCU configuration instance
  */
-const config_t* config_get()
+const config_t *config_get()
 {
     return &config_instance;
 }
