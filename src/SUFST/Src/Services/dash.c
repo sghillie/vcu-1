@@ -94,7 +94,7 @@ status_t dash_init(dash_context_t *dash_ptr, TX_BYTE_POOL *stack_pool_ptr, const
  */
 void dash_thread_entry(ULONG input)
 {
-    dash_context_t *dash_ptr = (dash_context_t *)input;
+    const dash_context_t *dash_ptr = (dash_context_t *)input;
 
     // see 'visible check' rule
     if (dash_ptr->config_ptr->vc_run_check)
@@ -190,7 +190,7 @@ status_t dash_set_ts_on_led_state(dash_context_t *dash_ptr, GPIO_PinState state)
  *
  * @details The calling thread is suspended until this occurs
  */
-status_t dash_wait_for_ts_on(dash_context_t *dash_ptr)
+status_t dash_wait_for_ts_on(const dash_context_t *dash_ptr)
 {
     input_context_t ts_on_input = { .port = TS_ON_BTN_GPIO_Port,
                                     .pin = TS_ON_BTN_Pin,
@@ -209,7 +209,7 @@ status_t dash_wait_for_ts_on(dash_context_t *dash_ptr)
  *
  * @details The calling thread is suspended until this occurs
  */
-status_t dash_wait_for_r2d(dash_context_t *dash_ptr)
+status_t dash_wait_for_r2d(const dash_context_t *dash_ptr)
 {
     input_context_t r2d_input = { .port = R2D_BTN_GPIO_Port,
                                   .pin = R2D_BTN_Pin,

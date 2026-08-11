@@ -3,7 +3,7 @@
 # Table of Contents
 
 - [About](#about)
-- [Development Environment](#development-environment)
+- [Development Environment](#setup--development-environment)
 - [Contributing](#contributing)
 - [Useful Resources](#useful-resources)
 - [Related Projects](#related-projects)

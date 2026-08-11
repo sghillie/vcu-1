@@ -58,8 +58,10 @@ lint:
         - src/AZURE_RTOS/**
         - src/Core/**
         - src/Drivers/**
-        - src/Middlewares/ST
-        - scripts/*
+        - src/Middlewares/**
+        - src/FileX/**
+        - src/USBX/**
+        - scripts/**
     - linters: [clang-format]
       paths:
         - src/SUFST/Inc/config.h

@@ -81,10 +81,10 @@ status_t vcu_init(vcu_context_t *vcu_ptr,
 
     rtcan_handle_t *rtcan_handles[] = { &vcu_ptr->rtcan_s, &vcu_ptr->rtcan_t };
     CAN_HandleTypeDef *can_handles[] = { can_s_h, can_t_h };
-    uint32_t rtcan_priorities[] = { vcu_ptr->config_ptr->rtos.rtcan_s_priority,
-                                    vcu_ptr->config_ptr->rtos.rtcan_t_priority };
+    const uint32_t rtcan_priorities[] = { vcu_ptr->config_ptr->rtos.rtcan_s_priority,
+                                          vcu_ptr->config_ptr->rtos.rtcan_t_priority };
     const CAN_FilterTypeDef *rtcan_filters[] = { can_s_filters, can_t_filters };
-    uint32_t rtcan_filter_counts[] = { 1U, 1U };
+    const uint32_t rtcan_filter_counts[] = { 1U, 1U };
 
     for (uint32_t i = 0; i < 2; i++)
     {

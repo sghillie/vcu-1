@@ -5,7 +5,7 @@
 /*
  * internal function prototypes
  */
-static inline uint16_t apply_deadzone(torque_map_t *map_ptr, uint16_t input);
+static inline uint16_t apply_deadzone(const torque_map_t *map_ptr, uint16_t input);
 static uint16_t null_torque_map(torque_map_t *map_ptr, uint16_t input);
 static uint16_t linear_torque_map(torque_map_t *map_ptr, uint16_t input);
 static uint16_t exponential_torque_map(torque_map_t *map_ptr, uint16_t input);
@@ -87,7 +87,7 @@ void torque_map_set_output_max(torque_map_t *map_ptr, uint16_t output_max)
  * @param[in]   map_ptr     Torque map
  * @param[in]   input       Input value
  */
-uint16_t apply_deadzone(torque_map_t *map_ptr, uint16_t input)
+uint16_t apply_deadzone(const torque_map_t *map_ptr, uint16_t input)
 {
     uint16_t result = 0;
 
@@ -122,11 +122,6 @@ uint16_t linear_torque_map(torque_map_t *map_ptr, uint16_t input)
     const float scale_factor = map_ptr->output_max / (float)map_ptr->config_ptr->input_max;
 
     const uint16_t torque = (uint16_t)(input * scale_factor);
-
-    if (input > map_ptr->config_ptr->input_max)
-    {
-        input = map_ptr->config_ptr->input_max;
-    }
 
     return torque;
 }

@@ -100,11 +100,11 @@ static void remote_ctrl_thread_entry(ULONG input)
     while (1)
     {
         rtcan_msg_t *msg_ptr = NULL;
-        rtcan_osal_status_t status =
+        rtcan_osal_status_t rec_status =
             rtcan_os_queue_receive(remote_ctrl_ptr->can_rx_queue, &msg_ptr,
                                    config_ptr->broadcast_timeout_ticks);
 
-        if (status == RTCAN_OS_OK && msg_ptr != NULL)
+        if (rec_status == RTCAN_OS_OK && msg_ptr != NULL)
         {
             if (lock_sim_sensors(remote_ctrl_ptr, 100) == STATUS_OK)
             {
@@ -117,14 +117,14 @@ static void remote_ctrl_thread_entry(ULONG input)
                 LOG_ERROR("Error locking sensors\n");
             }
         }
-        else if (status == RTCAN_OS_TIMEOUT)
+        else if (rec_status == RTCAN_OS_TIMEOUT)
         {
             LOG_ERROR("Broadcast timeout\n");
             reset_remote_ctrl_requests(remote_ctrl_ptr);
         }
         else
         {
-            LOG_ERROR("Broadcast Error: %d\n", status);
+            LOG_ERROR("Broadcast Error: %d\n", rec_status);
             reset_remote_ctrl_requests(remote_ctrl_ptr);
         }
         tx_thread_sleep(config_ptr->period);

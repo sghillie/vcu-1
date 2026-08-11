@@ -70,11 +70,11 @@ static void fans_thread_entry(ULONG input)
     while (1)
     {
         rtcan_msg_t *msg_ptr = NULL;
-        rtcan_osal_status_t status =
+        rtcan_osal_status_t rec_status =
             rtcan_os_queue_receive(fh->can_rx_queue, &msg_ptr,
                                    fh->config_ptr->broadcast_timeout_ticks);
 
-        if (status == RTCAN_OS_OK && msg_ptr != NULL)
+        if (rec_status == RTCAN_OS_OK && msg_ptr != NULL)
         {
             process_broadcast(fh, msg_ptr);
             rtcan_msg_consumed(fh->rtcan_s_h, msg_ptr);

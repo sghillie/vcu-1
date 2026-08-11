@@ -100,7 +100,7 @@ UINT testbench_apps_input()
         // end of lap handling
         if (end_of_lap)
         {
-            end_of_lap = false;
+            // end_of_lap = false;
             lookup_index = 0;
             lap_count++;
             last_lap_finish_time = current_time;
