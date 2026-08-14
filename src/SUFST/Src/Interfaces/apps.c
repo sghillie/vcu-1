@@ -88,7 +88,8 @@ status_t apps_read(apps_context_t *apps_ptr, uint16_t *reading_ptr)
     uint16_t diff = (reading_1 > reading_2) ? (reading_1 - reading_2) :
                                               (reading_2 - reading_1);
 
-    if (diff > apps_ptr->config_ptr->max_discrepancy)
+    if (diff > apps_ptr->config_ptr->max_discrepancy ||
+        diff < apps_ptr->config_ptr->min_discrepancy)
     {
         status = STATUS_ERROR;
         scs_error |= SCS_ERROR_APPS_DISCREPANCY;
