@@ -92,7 +92,6 @@ typedef struct
 {
     config_scs_t apps_1_scs;  // SCS configuration for first APPS signal
     config_scs_t apps_2_scs;  // SCS configuration for second APPS signal
-    uint32_t min_discrepancy; // minimum discrepancy between APPS readings
     uint32_t max_discrepancy; // maximum discrepancy between APPS readings
     bool inverted;            // APPS% = 100 - calculated value
 } config_apps_t;

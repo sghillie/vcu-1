@@ -62,7 +62,7 @@ status_t scs_read(scs_t *scs_ptr, uint16_t *reading_ptr)
     ADC_HandleTypeDef *hadc = scs_ptr->config_ptr->hadc;
     ADC_ChannelConfTypeDef ch = { .Channel = scs_ptr->config_ptr->adc_channel,
                                   .Rank = ADC_REGULAR_RANK_1,
-                                  .SamplingTime = ADC_SAMPLETIME_144CYCLES };
+                                  .SamplingTime = ADC_SAMPLETIME_480CYCLES };
 
     // configure port -> then read from the ADC and validate
     if ((HAL_ADC_ConfigChannel(hadc, &ch) == HAL_OK) && (HAL_ADC_Start(hadc) == HAL_OK) &&

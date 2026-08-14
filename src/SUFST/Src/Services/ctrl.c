@@ -552,7 +552,7 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t *ctrl_ptr)
         if ((ctrl_ptr->apps_reading < ctrl_ptr->config_ptr->apps_bps_low_threshold) &&
             !ctrl_ptr->tick_ptr->brakelight_pwr)
         {
-            if (tx_time_get() > ctrl_ptr->apps_bps_fault_start + TX_TIMER_TICKS_PER_SECOND)
+            if (tx_time_get() > ctrl_ptr->apps_bps_fault_start + TX_TIMER_TICKS_PER_SECOND / 10)
             {
                 return CTRL_STATE_TS_ON;
             }
@@ -561,6 +561,17 @@ static ctrl_state_t ctrl_proc_apps_bps_fault(ctrl_context_t *ctrl_ptr)
         {
             ctrl_ptr->apps_bps_fault_start = tx_time_get();
         }
+    }
+
+    if (ctrl_ptr->dash_ptr->tson_flag)
+    {
+        ctrl_ptr->dash_ptr->tson_flag = false;
+
+        ctrl_ptr->error = CTRL_ERROR_NONE;
+        pm100_clear_error(ctrl_ptr->pm100_ptr);
+        tick_clear_apps_scs_error(ctrl_ptr->tick_ptr);
+
+        return CTRL_STATE_TS_BUTTON_WAIT;
     }
 
     return ctrl_ptr->state;

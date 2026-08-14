@@ -58,8 +58,8 @@ static const config_t config_instance = {
 	 .apps_1_scs = {
             .hadc = &hadc1,
             .adc_channel = ADC_CHANNEL_8,
-            .min_adc = 166, //79 measured - 77 set - 136 previous 
-            .max_adc = 1658, // 1830 measured - 1850 set - 1405 previous
+            .min_adc = 136, //79 measured - 77 set - 136 previous 
+            .max_adc = 1536, // 1830 measured - 1850 set - 1405 previous
             .min_mapped = 0,
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.10f
@@ -67,13 +67,12 @@ static const config_t config_instance = {
         .apps_2_scs = {
             .hadc = &hadc2,
             .adc_channel = ADC_CHANNEL_15,
-            .min_adc = 837, // 750 measured - 740 set - 786 previous
-            .max_adc = 2402, //2660 measured - 2700 set - 2050 previous
+            .min_adc = 803, // 750 measured - 740 set - 786 previous
+            .max_adc = 2298, //2660 measured - 2700 set - 2050 previous
             .min_mapped = 0, 
             .max_mapped = 1000,
             .outside_bounds_fraction = 0.10f
-        },
-        .min_discrepancy = 0, 
+        }, 
         .max_discrepancy = 30, // TODO: reduce this (ideally 10, worse case 25-30) by doing a better calibration once this is finalised in the car
         .inverted = true
     },
