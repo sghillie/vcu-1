@@ -24,6 +24,13 @@ source .venv/bin/activate
 python3 -m pip install ccdgen
 make -s ccd
 
+echo "Setting up Trunk"
+curl https://get.trunk.io -fsSL | bash
+trunk init || echo "trunk already initialised, skipping"
+trunk check
+
+echo
+
 echo "Ensure that Visual Studio Code is installed on Windows!"
 echo "Then install the WSL extension"
 echo "once complete run 'code .' in wsl
