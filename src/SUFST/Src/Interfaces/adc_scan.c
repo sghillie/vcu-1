@@ -63,9 +63,9 @@ status_t adc_scan_init(void)
  * @param[in]   hadc    ADC instance (&hadc1 or &hadc2)
  * @param[in]   slot    0-based index into hadc's scan sequence (rank - 1)
  */
-uint16_t adc_scan_get_average(ADC_HandleTypeDef *hadc, uint8_t slot)
+uint16_t adc_scan_get_average(const ADC_HandleTypeDef *hadc, uint8_t slot)
 {
-    volatile uint16_t *buf;
+    const volatile uint16_t *buf;
     uint8_t stride;
     uint16_t num_scans;
 
@@ -96,7 +96,7 @@ uint16_t adc_scan_get_average(ADC_HandleTypeDef *hadc, uint8_t slot)
  * @brief   True once hadc has completed at least one full scan cycle and has
  *          not since faulted (e.g. DMA overrun)
  */
-bool adc_scan_is_ready(ADC_HandleTypeDef *hadc)
+bool adc_scan_is_ready(const ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance == ADC2)
     {
@@ -106,6 +106,7 @@ bool adc_scan_is_ready(ADC_HandleTypeDef *hadc)
     return adc1_primed && !adc1_faulted;
 }
 
+// trunk-ignore(cppcheck/constParameterPointer)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance == ADC1)
@@ -120,6 +121,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
     }
 }
 
+// trunk-ignore(cppcheck/constParameterPointer)
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)
 {
     if (hadc->Instance == ADC1)

@@ -21,7 +21,7 @@
  */
 
 status_t adc_scan_init(void);
-uint16_t adc_scan_get_average(ADC_HandleTypeDef *hadc, uint8_t slot);
-bool adc_scan_is_ready(ADC_HandleTypeDef *hadc);
+uint16_t adc_scan_get_average(const ADC_HandleTypeDef *hadc, uint8_t slot);
+bool adc_scan_is_ready(const ADC_HandleTypeDef *hadc);
 
 #endif // ADC_SCAN_H
