@@ -13,6 +13,8 @@
 #include "rtds.h"
 #include "trc.h"
 
+#define SECONDS_TO_TICKS(x) (TX_TIMER_TICKS_PER_SECOND * x)
+
 /*
  * internal function prototypes
  */
@@ -43,6 +45,7 @@ status_t ctrl_init(ctrl_context_t *ctrl_ptr,
                    remote_ctrl_context_t *remote_ctrl_ptr,
                    canbc_context_t *canbc_ptr,
                    fans_context_t *fans_ptr,
+                   rtcan_handle_t *rtcan_t_h,
                    TX_BYTE_POOL *stack_pool_ptr,
                    const config_ctrl_t *config_ptr,
                    const config_rtds_t *rtds_config_ptr,
@@ -70,6 +73,7 @@ status_t ctrl_init(ctrl_context_t *ctrl_ptr,
     ctrl_ptr->pump_pwr = false;
     ctrl_ptr->fan_pwr = false;
     ctrl_ptr->remote_ctrl_ptr = remote_ctrl_ptr;
+    ctrl_ptr->rtcan_t_h = rtcan_t_h;
 
     // create the thread
     void *stack_ptr = NULL;
@@ -83,6 +87,25 @@ status_t ctrl_init(ctrl_context_t *ctrl_ptr,
                              ctrl_thread_entry, (ULONG)ctrl_ptr, stack_ptr,
                              config_ptr->thread.stack_size, config_ptr->thread.priority,
                              config_ptr->thread.priority, TX_NO_TIME_SLICE, TX_AUTO_START);
+    }
+
+    if (tx_status == TX_SUCCESS)
+    {
+        if (rtcan_os_queue_create(&ctrl_ptr->can_rx_queue, NULL, sizeof(rtcan_msg_t *),
+                                  FANS_RX_QUEUE_SIZE, ctrl_ptr->can_rx_queue_mem,
+                                  sizeof(ctrl_ptr->can_rx_queue_mem)) != RTCAN_OS_OK)
+        {
+            tx_status = TX_START_ERROR;
+        }
+    }
+
+    rtcan_status_t sub_status = rtcan_subscribe(ctrl_ptr->rtcan_t_h, CAN_T_BMS_PACK_STATE_FRAME_ID,
+                                                ctrl_ptr->can_rx_queue);
+
+    if (sub_status != RTCAN_OK)
+    {
+        LOG_ERROR("Could not subscribe on message. Terminating thread\n");
+        tx_thread_terminate(&ctrl_ptr->thread);
     }
 
     status_t status = (tx_status == TX_SUCCESS) ? STATUS_OK : STATUS_ERROR;
@@ -412,22 +435,22 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t *ctrl_ptr)
     if (ctrl_ptr->current_mode != CTRL_MODE_REMOTE_CTRL)
     {
         // Check for brake + accel pedal pressed
-        if (ctrl_ptr->apps_reading >= ctrl_ptr->config_ptr->apps_bps_high_threshold &&
-            ctrl_ptr->tick_ptr->brakelight_pwr)
-        {
-            LOG_ERROR("BP and AP pressed\n");
+        // if (ctrl_ptr->apps_reading >= ctrl_ptr->config_ptr->apps_bps_high_threshold &&
+        //     ctrl_ptr->tick_ptr->brakelight_pwr)
+        // {
+        //     LOG_ERROR("BP and AP pressed\n");
 
-            if (tx_time_get() >= ctrl_ptr->apps_bps_start + (TX_TIMER_TICKS_PER_SECOND / 50))
-            {
-                LOG_ERROR("BP-AP fault\n");
-                ctrl_ptr->apps_bps_fault_start = tx_time_get();
-                return CTRL_STATE_APPS_BPS_FAULT;
-            }
-        }
-        else
-        {
-            ctrl_ptr->apps_bps_start = tx_time_get();
-        }
+        //     if (tx_time_get() >= ctrl_ptr->apps_bps_start + (TX_TIMER_TICKS_PER_SECOND / 50))
+        //     {
+        //         LOG_ERROR("BP-AP fault\n");
+        //         ctrl_ptr->apps_bps_fault_start = tx_time_get();
+        //         return CTRL_STATE_APPS_BPS_FAULT;
+        //     }
+        // }
+        // else
+        // {
+        //     ctrl_ptr->apps_bps_start = tx_time_get();
+        // }
 
         ctrl_ptr->torque_request =
             torque_map_apply(&ctrl_ptr->torque_map, ctrl_ptr->apps_reading);
@@ -435,6 +458,37 @@ static ctrl_state_t ctrl_proc_ts_on(ctrl_context_t *ctrl_ptr)
     else
     {
         ctrl_ptr->torque_request = remote_get_torque_reading(ctrl_ptr->remote_ctrl_ptr);
+    }
+
+    rtcan_msg_t *msg_ptr = NULL;
+    rtcan_osal_status_t rec_status =
+        rtcan_os_queue_receive(ctrl_ptr->can_rx_queue, &msg_ptr, SECONDS_TO_TICKS(0.02));
+
+    if (rec_status == RTCAN_OS_OK && msg_ptr != NULL)
+    {
+        struct can_t_bms_pack_state_t data;
+        can_t_bms_pack_state_unpack(&data, msg_ptr->data, msg_ptr->length);
+        double power_w = can_t_bms_pack_state_bms_pack_current_decode(data.bms_pack_current) *
+            can_t_bms_pack_state_bms_pack_inst_voltage_decode(data.bms_pack_inst_voltage);
+        rtcan_msg_consumed(ctrl_ptr->rtcan_t_h, msg_ptr);
+        if (power_w > 80000)
+        {
+            ctrl_ptr->torque_request = 1500;
+        }
+        else if (power_w > 70000)
+        {
+            double ratio = 1 - ((80000 - power_w) / 10000);
+            ctrl_ptr->torque_request = ctrl_ptr->torque_request - 800 * ratio;
+        }
+    }
+    else if (ctrl_ptr->torque_request > 1500)
+    {
+        ctrl_ptr->torque_request = 1500;
+    }
+
+    if (ctrl_ptr->torque_request < 0)
+    {
+        ctrl_ptr->torque_request = 0;
     }
 
     LOG_INFO("ADC: %d, Torque: %d\n", ctrl_ptr->apps_reading, ctrl_ptr->torque_request);

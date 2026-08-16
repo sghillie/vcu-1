@@ -116,6 +116,10 @@ typedef struct
 
     uint8_t error; // error code
 
+    rtcan_handle_t *rtcan_t_h;
+    rtcan_queue_t can_rx_queue;
+    uint32_t can_rx_queue_mem[RTCAN_OS_QUEUE_MEM_SIZE(FANS_RX_QUEUE_SIZE, sizeof(rtcan_msg_t *)) / sizeof(uint32_t)];
+
 } ctrl_context_t;
 
 /*
@@ -128,6 +132,7 @@ status_t ctrl_init(ctrl_context_t *ctrl_ptr,
                    remote_ctrl_context_t *remote_ctrl_ptr,
                    canbc_context_t *canbc_ptr,
                    fans_context_t *fans_ptr,
+                   rtcan_handle_t *rtcan_t_h,
                    TX_BYTE_POOL *stack_pool_ptr,
                    const config_ctrl_t *config_ptr,
                    const config_rtds_t *rtds_config_ptr,
