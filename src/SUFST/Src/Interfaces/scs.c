@@ -114,18 +114,8 @@ uint16_t get_adc(const scs_t *scs_ptr)
  */
 uint16_t map_adc_reading(scs_t *scs_ptr)
 {
-    uint16_t clipped = clip_to_range(scs_ptr->adc_reading, scs_ptr->config_ptr->min_adc,
-                                     scs_ptr->config_ptr->max_adc);
-
-    uint16_t shifted = clipped - scs_ptr->config_ptr->min_adc;
-
-    uint16_t scaled = (scs_ptr->scale_up) ? shifted * scs_ptr->scale_factor :
-                                            shifted / scs_ptr->scale_factor;
-
-    uint16_t mapped = scaled + scs_ptr->config_ptr->min_mapped;
-
-    return clip_to_range(mapped, scs_ptr->config_ptr->min_mapped,
-                         scs_ptr->config_ptr->max_mapped);
+    uint16_t mapped = clip_to_range_shifted_and_scaled(scs_ptr->adc_reading, scs_ptr->scale_factor, scs_ptr->config_ptr->min_adc, scs_ptr->config_ptr->max_adc) + scs_ptr->config_ptr->min_mapped;
+    return clip_to_range(mapped, scs_ptr->config_ptr->min_mapped, scs_ptr->config_ptr->max_mapped);
 }
 
 /**
