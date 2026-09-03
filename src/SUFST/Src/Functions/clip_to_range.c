@@ -16,3 +16,9 @@ uint16_t clip_to_range(uint16_t value, uint16_t min, uint16_t max)
 {
     return value < min ? min : value > max ? max : value;
 }
+
+uint16_t clip_to_range_shifted_and_scaled(uint16_t value, float scalar, uint16_t min, uint16_t max)
+{
+    // scalar * (clipped - min)    
+    return = (uint16_t)(scalar * (float)(clip_to_range(value, min, max) - min));
+}
