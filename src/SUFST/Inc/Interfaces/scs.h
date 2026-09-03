@@ -32,7 +32,6 @@ typedef struct
     uint16_t mapped_reading;        // latest mapped reading
     bool is_valid;                  // true if signal is within bounds
     uint32_t invalid_start_tick;    // tick at which signal became invalid
-    bool scale_up;                  // flag indicating scaling up
     float scale_factor;             // cached scale factor for mapping
     uint32_t max_bounds_diff;       // cached bounds difference for validation
     const config_scs_t *config_ptr; // configuration
