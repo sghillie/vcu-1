@@ -10,5 +10,6 @@
 #include <stdint.h>
 
 uint16_t clip_to_range(uint16_t value, uint16_t min, uint16_t max);
+uint16_t clip_to_range_shifted_and_scaled(uint16_t value, float scalar, uint16_t min, uint16_t max);
 
 #endif
