@@ -37,9 +37,7 @@ status_t scs_create(scs_t *scs_ptr, const config_scs_t *config_ptr)
     uint32_t mapped_range = config_ptr->max_mapped - config_ptr->min_mapped;
 
     // pre-compute the scale factors and validation constants
-    scs_ptr->scale_up = (adc_range < mapped_range);
-    scs_ptr->scale_factor = scs_ptr->scale_up ? ((float)mapped_range / adc_range) :
-                                                ((float)adc_range / mapped_range);
+    scs_ptr->scale_factor = adc_range < mapped_range ? ((float)mapped_range / adc_range) : ((float)adc_range / mapped_range);
     scs_ptr->max_bounds_diff = adc_range * config_ptr->outside_bounds_fraction;
 
     return STATUS_OK;
